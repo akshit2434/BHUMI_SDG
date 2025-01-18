@@ -1,0 +1,109 @@
+@import "../../globals.scss";
+
+.section {
+    @include card-base;
+    background: var(--color-surface);
+    padding: 2.5rem;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--color-shadow);
+    box-shadow: 8px 8px 0 var(--color-shadow);
+}
+
+.title {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--color-text);
+    margin-bottom: 2rem;
+    position: relative;
+    display: inline-block;
+
+    &::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        bottom: -0.5rem;
+        width: 100%;
+        height: 0.3rem;
+        background: var(--color-primary);
+        border-radius: 4px;
+    }
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+}
+
+.inputCard {
+    @include card-base;
+    background: var(--color-background);
+    padding: 1.5rem;
+    transition: all 0.2s ease;
+
+    &:hover {
+        transform: translate(-2px, -2px);
+        box-shadow: 6px 6px 0 var(--color-shadow);
+    }
+}
+
+.cardTitle {
+    color: var(--color-text);
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    position: relative;
+    display: inline-block;
+
+    &::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        bottom: -0.3rem;
+        width: 100%;
+        height: 2px;
+        background: var(--color-primary);
+    }
+}
+
+.input {
+    @include input-base;
+    background: var(--color-surface);
+    margin-bottom: 0.5rem;
+
+    &::-webkit-inner-spin-button,
+    &::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    &[type="number"] {
+        -moz-appearance: textfield;
+    }
+}
+
+.hint {
+    color: var(--color-text);
+    opacity: 0.7;
+    font-size: 0.8rem;
+    margin-top: 0.5rem;
+}
+
+.submitButton {
+    @include button-base;
+    margin-top: 1rem;
+    background: var(--color-primary);
+    transition: all 0.2s ease;
+
+    &:hover {
+        background: var(--color-primary-light);
+        transform: translate(-3px, -3px);
+        box-shadow: 6px 6px 0 var(--color-shadow);
+    }
+
+    &:active {
+        transform: translate(0, 0);
+        box-shadow: 2px 2px 0 var(--color-shadow);
+    }
+}

@@ -1,0 +1,73 @@
+@import "../../globals.scss";
+
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 280px;
+    background: var(--color-background);
+    border-right: 1px solid var(--color-shadow);
+    box-shadow: 4px 0 0 var(--color-shadow);
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--color-text);
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--color-shadow);
+
+    svg {
+        font-size: 2.2rem;
+        margin-right: 0.8rem;
+    }
+}
+
+.userInfo {
+    @include card-base;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    margin-bottom: 2rem;
+
+    .avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: var(--color-primary-light);
+        border: 2px solid var(--color-shadow);
+    }
+}
+
+.navList {
+    list-style: none;
+}
+
+.navItem {
+    @include card-base;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    margin: 0.5rem 0;
+    cursor: pointer;
+    @include card-hover;
+
+    &.active {
+        background: var(--color-primary-light);
+    }
+}
+
+.logoutBtn {
+    @include button-base;
+    margin-top: auto;
+    background: var(--color-error);
+}

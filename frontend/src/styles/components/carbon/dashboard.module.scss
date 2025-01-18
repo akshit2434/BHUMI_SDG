@@ -1,0 +1,41 @@
+@import "../../globals.scss";
+
+.container {
+    min-height: 100vh;
+    display: flex;
+    background-color: var(--color-page-background);
+}
+
+.mainContent {
+    margin-left: 280px;
+    width: calc(100% - 280px);
+    padding: 2rem 3rem;
+    min-height: 100vh;
+}
+
+.header {
+    margin-bottom: 2rem;
+
+    h1 {
+        font-size: 3.5rem;
+        font-weight: 800;
+        color: var(--color-text);
+        position: relative;
+        display: inline-block;
+
+        &::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            bottom: -0.5rem;
+            width: 100%;
+            height: 0.5rem;
+            background: var(--color-primary);
+            border-radius: 4px;
+        }
+    }
+}
+
+.dashboardContent {
+    // Add any specific dashboard content styles here
+}

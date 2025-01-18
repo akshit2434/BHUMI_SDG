@@ -1,0 +1,80 @@
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans",
+    "Droid Sans", "Helvetica Neue", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+}
+
+:root {
+  --color-primary: #7cb342;
+  --color-primary-light: #aed581;
+  --color-background: #e1f0d4;
+  --color-surface: #ffffff;
+  --color-text: #3b2017;
+  --color-error: #d32f2f;
+  --color-success: #388e3c;
+
+  --shadow-elevation-1: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shadow-elevation-2: 0 4px 8px rgba(0, 0, 0, 0.12);
+  --shadow-elevation-3: 0 8px 16px rgba(0, 0, 0, 0.14);
+
+  --color-shadow: #2b1810;
+  --border-radius: 32px;
+  --spacing-unit: 8px;
+  --color-page-background: #fff5e6;
+}
+
+// Mixins
+@mixin card-hover {
+  transition: all 0.2s ease;
+  &:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 var(--color-shadow);
+  }
+}
+
+@mixin card-base {
+  background: var(--color-surface);
+  border: 1px solid var(--color-shadow);
+  border-radius: calc(var(--border-radius) / 2);
+  box-shadow: 4px 4px 0 var(--color-shadow);
+}
+
+@mixin input-base {
+  width: 100%;
+  padding: calc(var(--spacing-unit) * 2);
+  @include card-base;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: 1rem;
+
+  &:focus {
+    outline: none;
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 var(--color-shadow);
+  }
+}
+
+@mixin button-base {
+  width: 100%;
+  padding: calc(var(--spacing-unit) * 3);
+  background: var(--color-primary);
+  color: white;
+  border: 1px solid var(--color-shadow);
+  border-radius: calc(var(--border-radius) / 2);
+  font-size: 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+  @include card-hover;
+}

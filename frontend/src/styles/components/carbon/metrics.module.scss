@@ -1,0 +1,54 @@
+@import "../../globals.scss";
+
+.metricsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.metricCard {
+    @include card-base;
+    padding: 1.5rem;
+    transition: all 0.2s ease;
+
+    &:hover {
+        transform: translate(-3px, -3px);
+        box-shadow: 7px 7px 0 var(--color-shadow);
+    }
+}
+
+.title {
+    color: var(--color-text);
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.value {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--color-text);
+    margin: 1rem 0;
+
+    &.reduction {
+        color: var(--color-success);
+        position: relative;
+        display: inline-block;
+
+        &::before {
+            content: "↓";
+            margin-right: 0.2rem;
+        }
+    }
+
+    &.onTrack {
+        color: var(--color-primary);
+    }
+}
+
+.unit {
+    color: var(--color-text);
+    opacity: 0.7;
+    font-size: 0.9rem;
+}
