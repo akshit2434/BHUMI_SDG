@@ -1,48 +1,96 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from models.emission import EmissionLog
+from models.emission import EmissionLog  # Now correctly importing EmissionLog
 from models.user_units import UserUnits
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # Change the blueprint registration to include url_prefix
 emission_bp = Blueprint('emission', __name__, url_prefix='/api')
 
 def get_db():
     from flask import current_app
-    return current_app.config['DATABASE']
+    return current_app.config['DATABASE'] 
 
-@emission_bp.route('/emissions/log', methods=['POST'])
+# Helper functions
+def get_day_before(date):
+    return date - timedelta(days=1)
+
+def get_day_after(date):
+    return date + timedelta(days=1)
+
+def is_contiguous(existing_ranges, new_start, new_end):
+    if not existing_ranges:
+        return True
+
+    # Sort existing ranges by start_date
+    sorted_ranges = sorted(existing_ranges, key=lambda x: x['start_date'])
+
+    # Check adjacency before the earliest range
+    earliest_start = sorted_ranges[0]['start_date']
+    if get_day_before(earliest_start) == new_end:
+        return True
+
+    # Check adjacency after the latest range
+    latest_end = sorted_ranges[-1]['end_date']
+    if get_day_after(latest_end) == new_start:
+        return True
+
+    # Check if the new range fills an exact gap between two ranges
+    for i in range(len(sorted_ranges) - 1):
+        current_end = sorted_ranges[i]['end_date']
+        next_start = sorted_ranges[i + 1]['start_date']
+        if get_day_after(current_end) == new_start and get_day_before(next_start) == new_end:
+            return True
+
+    return False
+
+@emission_bp.route('/emissions/log', methods=['POST'])  # Remove /api prefix
 @jwt_required()
 def log_emission():
     try:
         data = request.get_json()
+        print("Received emission data:", data)  # Debug log
+        
+        required_fields = ['inputs', 'start_date', 'end_date']
+        missing_fields = [field for field in required_fields if field not in data]
+        if missing_fields:
+            print("Missing fields:", missing_fields)  # Debug log
+            return jsonify({
+                'error': f'Missing required fields: {", ".join(missing_fields)}'
+            }), 400
+
         email = get_jwt_identity()
         
-        if not data or 'inputs' not in data:
-            return jsonify({'error': 'Missing inputs data'}), 400
-
-        # Get user ID from email
         db = get_db()
         user = db.users.find_one({'email': email})
         if not user:
             return jsonify({'error': 'User not found'}), 404
+
         user_id = str(user['_id'])
-
-        # Validate inputs structure
         inputs = data['inputs']
-        if not isinstance(inputs, dict):
-            return jsonify({'error': 'Inputs must be a dictionary'}), 400
+        
+        # Validate dates
+        try:
+            start_date = datetime.fromisoformat(data['start_date'])
+            end_date = datetime.fromisoformat(data['end_date'])
+            if end_date <= start_date:
+                return jsonify({'error': 'End date must be after start date'}), 400
+        except ValueError:
+            return jsonify({'error': 'Invalid date format'}), 400
 
-        for source, input_data in inputs.items():
-            if not isinstance(input_data, dict):
-                return jsonify({'error': f'Invalid input data for {source}'}), 400
-            if not all(key in input_data for key in ['value', 'unit', 'emission_factor']):
-                return jsonify({'error': f'Missing required fields for {source}'}), 400
-            try:
-                input_data['value'] = float(input_data['value'])
-                input_data['emission_factor'] = float(input_data['emission_factor'])
-            except (ValueError, TypeError):
-                return jsonify({'error': f'Invalid numeric values for {source}'}), 400
+        # Fetch existing emission ranges for contiguity check
+        existing_emissions = list(db.emissions.find(
+            {'user_id': user_id},
+            {'start_date': 1, 'end_date': 1, '_id': 0}
+        ))
+        existing_ranges = [{
+            'start_date': emission['start_date'],
+            'end_date': emission['end_date']
+        } for emission in existing_emissions]
+
+        # Check for contiguity
+        if not is_contiguous(existing_ranges, start_date, end_date):
+            return jsonify({'error': 'Emission period must be contiguous with existing logs'}), 400
 
         # Calculate total emissions
         total_emissions = sum(
@@ -50,28 +98,28 @@ def log_emission():
             for input_data in inputs.values()
         )
 
-        # Create emission log document
-        emission_doc = {
-            'user_id': user_id,
-            'industry_name': data.get('industry_name', 'default'),
-            'inputs': inputs,
-            'total_emissions': total_emissions,
-            'logged_at': datetime.utcnow()
-        }
-        
-        result = db.emissions.insert_one(emission_doc)
+        # Create and save emission log
+        emission = EmissionLog(
+            user_id=user_id,
+            inputs=inputs,
+            total_emissions=total_emissions,
+            start_date=start_date,
+            end_date=end_date
+        )
+
+        result = db.emissions.insert_one(emission.to_dict())
         
         return jsonify({
             'message': 'Emission logged successfully',
             'id': str(result.inserted_id),
             'total_emissions': total_emissions
         }), 201
-        
+
     except Exception as e:
         print(f"Error logging emission: {str(e)}")
-        return jsonify({'error': 'Failed to log emission', 'details': str(e)}), 500
+        return jsonify({'error': str(e)}), 500
 
-@emission_bp.route('/emissions/history', methods=['GET', 'OPTIONS'])
+@emission_bp.route('/emissions/history', methods=['GET', 'OPTIONS'])  # Remove /api prefix
 @jwt_required()
 def get_emission_history():
     if request.method == 'OPTIONS':
@@ -87,6 +135,7 @@ def get_emission_history():
             return jsonify({'error': 'User not found'}), 404
         user_id = str(user['_id'])
         
+        # Get pagination parameters
         page = int(request.args.get('page', 1))
         limit = int(request.args.get('limit', 10))
         
@@ -94,32 +143,42 @@ def get_emission_history():
         total = db.emissions.count_documents({'user_id': user_id})
         
         # Get paginated emissions for the user
-        emissions = list(db.emissions.find(
+        emissions_cursor = db.emissions.find(
             {'user_id': user_id},
             {
                 '_id': 1,
                 'inputs': 1,
                 'total_emissions': 1,
                 'logged_at': 1,
+                'start_date': 1,
+                'end_date': 1,
                 'industry_name': 1
             }
-        ).sort('logged_at', -1).skip((page - 1) * limit).limit(limit))
+        ).sort('logged_at', -1).skip((page - 1) * limit).limit(limit)
         
-        # Process each emission record
-        for emission in emissions:
+        # Convert cursor to list and process each emission record
+        emissions = []
+        for emission in emissions_cursor:
             emission['_id'] = str(emission['_id'])
-            # Convert datetime to string for JSON serialization
-            emission['logged_at'] = emission['logged_at'].isoformat()
+            if 'logged_at' in emission:
+                emission['logged_at'] = emission['logged_at'].isoformat()
+            if 'start_date' in emission:
+                emission['start_date'] = emission['start_date'].isoformat()
+            if 'end_date' in emission:
+                emission['end_date'] = emission['end_date'].isoformat()
             
             # Process inputs
-            processed_inputs = {}
-            for source, data in emission['inputs'].items():
-                processed_inputs[source] = {
-                    'value': float(data['value']),
-                    'unit': data['unit'],
-                    'emission_factor': float(data['emission_factor'])
-                }
-            emission['inputs'] = processed_inputs
+            if 'inputs' in emission:
+                processed_inputs = {}
+                for source, data in emission['inputs'].items():
+                    processed_inputs[source] = {
+                        'value': float(data['value']),
+                        'unit': data['unit'],
+                        'emission_factor': float(data['emission_factor'])
+                    }
+                emission['inputs'] = processed_inputs
+            
+            emissions.append(emission)
         
         return jsonify({
             'emissions': emissions,
@@ -131,7 +190,7 @@ def get_emission_history():
         print(f"Error fetching emission history: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
-@emission_bp.route('/units', methods=['GET', 'OPTIONS'])
+@emission_bp.route('/units', methods=['GET', 'OPTIONS'])  # Remove /api prefix
 @jwt_required()
 def get_user_units():
     if request.method == 'OPTIONS':
@@ -168,7 +227,7 @@ def get_user_units():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@emission_bp.route('/units', methods=['PUT', 'OPTIONS'])
+@emission_bp.route('/units', methods=['PUT', 'OPTIONS'])  # Remove /api prefix
 @jwt_required()
 def update_user_units():
     if request.method == 'OPTIONS':
@@ -222,7 +281,7 @@ def update_user_units():
         print(f"Error updating units: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
-@emission_bp.route('/emissions/metrics', methods=['PUT', 'DELETE', 'OPTIONS'])
+@emission_bp.route('/emissions/metrics', methods=['PUT', 'DELETE', 'OPTIONS'])  # Remove /api prefix
 @jwt_required()
 def manage_metrics():
     if request.method == 'OPTIONS':
@@ -310,7 +369,7 @@ def manage_metrics():
 
 # ...existing code...
 
-@emission_bp.route('/metrics/add', methods=['POST'])
+@emission_bp.route('/metrics/add', methods=['POST'])  # Remove /api prefix
 @jwt_required()
 def add_custom_metric():
     try:
@@ -321,7 +380,7 @@ def add_custom_metric():
         # Validate request data
         required_fields = ['metric_name', 'unit_name', 'emission_factor']
         if not all(field in data for field in required_fields):
-            return jsonify({'error': 'Missing required fields'}), 400
+            return jsonify({'error': 'Missing brbr required fields'}), 400 
 
         # Get user
         user = db.users.find_one({'email': email})
@@ -369,17 +428,89 @@ def add_custom_metric():
         print(f"Error adding custom metric: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
-# ...existing code...
-
-from models.user_units import UserUnits
-
-# Example route where UserUnits is instantiated
-@emission_bp.route('/some-route', methods=['POST'])  # Changed from @app.route to @emission_bp.route
+@emission_bp.route('/emissions/period', methods=['GET'])
 @jwt_required()
-def some_route():
-    # ...existing code...
-    
-    user_units = UserUnits(user_id=user_id, industry=user_industry)
-    db.user_units.insert_one(user_units.to_dict())
-    
-    # ...existing code...
+def get_emissions_for_period():
+    try:
+        start_date = request.args.get('start')
+        end_date = request.args.get('end')
+
+        if not start_date or not end_date:
+            return jsonify({
+                'error': 'Both start and end dates are required'
+            }), 400
+
+        try:
+            start = datetime.fromisoformat(start_date.replace('Z', '+00:00'))
+            end = datetime.fromisoformat(end_date.replace('Z', '+00:00'))
+        except ValueError:
+            return jsonify({
+                'error': 'Invalid date format. Use ISO format.'
+            }), 400
+
+        db = get_db()
+        email = get_jwt_identity()
+        user = db.users.find_one({'email': email})
+        
+        if not user:
+            return jsonify({'error': 'User not found'}), 404
+
+        # Find emissions within the date range
+        emissions = list(db.emissions.find({
+            'user_id': str(user['_id']),
+            'start_date': {'$gte': start},
+            'end_date': {'$lte': end}
+        }).sort('start_date', 1))
+
+        # Format the response
+        formatted_emissions = []
+        for emission in emissions:
+            emission['_id'] = str(emission['_id'])
+            emission['start_date'] = emission['start_date'].isoformat()
+            emission['end_date'] = emission['end_date'].isoformat()
+            if 'logged_at' in emission:
+                emission['logged_at'] = emission['logged_at'].isoformat()
+            formatted_emissions.append(emission)
+
+        return jsonify({
+            'data': formatted_emissions,
+            'count': len(formatted_emissions)
+        }), 200
+
+    except Exception as e:
+        print(f"Error fetching emissions for period: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+@emission_bp.route('/emissions/ranges', methods=['GET'])
+@jwt_required()
+def get_emission_ranges():
+    try:
+        db = get_db()
+        email = get_jwt_identity()
+        user = db.users.find_one({'email': email})
+        
+        if not user:
+            return jsonify({'error': 'User not found'}), 404
+
+        # Get all emission date ranges for the user
+        ranges = list(db.emissions.find(
+            {'user_id': str(user['_id'])},
+            {'start_date': 1, 'end_date': 1, '_id': 0}
+        ))
+
+        # Format dates to ISO string
+        formatted_ranges = [
+            {
+                'start': range['start_date'].isoformat(),
+                'end': range['end_date'].isoformat()
+            }
+            for range in ranges
+        ]
+
+        return jsonify({
+            'ranges': formatted_ranges
+        }), 200
+
+    except Exception as e:
+        print(f"Error fetching emission ranges: {str(e)}")
+        return jsonify({'error': str(e)}), 500

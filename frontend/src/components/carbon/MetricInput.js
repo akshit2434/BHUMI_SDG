@@ -7,6 +7,7 @@ import EditMetricModal from './EditMetricModal';
 import Loader from '../common/Loader';
 import styles from '../../styles/components/carbon/metric-input.module.scss';
 import CustomMetricForm from './CustomMetricForm';
+import DateRangePicker from './DateRangePicker';
 
 const TableHeader = () => (
     <div className={styles.tableHeader}>
@@ -21,7 +22,6 @@ const TableHeader = () => (
 );
 
 const MetricInput = ({ onSubmit, onEdit }) => {
-    console.log('MetricInput component mounted');
 
     const [metrics, setMetrics] = useState([]);
     const [error, setError] = useState(null);
@@ -34,21 +34,19 @@ const MetricInput = ({ onSubmit, onEdit }) => {
     const [editingMetric, setEditingMetric] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [showCustomMetricForm, setShowCustomMetricForm] = useState(false);
+    const [startDate, setStartDate] = useState('');
+    const [endDate, setEndDate] = useState('');
 
     const initializeData = async () => {
         setIsLoading(true);
         try {
             console.group('MetricInput - Data Initialization');
-            console.log('Fetching metrics data...');
 
             const response = await EmissionService.getUserUnits();
-            console.log('Raw Response:', response);
 
             if (!response?.metrics || !Array.isArray(response.metrics)) {
                 throw new Error('Invalid metrics data format received');
             }
-
-            console.log('Metrics Array:', response.metrics);
 
             const initialInputs = {};
             const initialUnits = {};
@@ -58,9 +56,6 @@ const MetricInput = ({ onSubmit, onEdit }) => {
                     initialUnits[metric.name] = metric.units[0].name;
                 }
             });
-
-            console.log('Initial Inputs:', initialInputs);
-            console.log('Initial Units:', initialUnits);
 
             setMetrics(response.metrics);
             setInputs(initialInputs);
@@ -79,9 +74,7 @@ const MetricInput = ({ onSubmit, onEdit }) => {
     const hasInitialized = useRef(false);
 
     useEffect(() => {
-        console.log('MetricInput useEffect triggered');
         if (!hasInitialized.current) {
-            console.log('Initializing data...');
             initializeData();
             hasInitialized.current = true;
         }
@@ -111,6 +104,11 @@ const MetricInput = ({ onSubmit, onEdit }) => {
 
         if (isSubmitting) return;
 
+        if (!startDate || !endDate) {
+            toast.error('Please select start and end dates');
+            return;
+        }
+
         try {
             setIsSubmitting(true);
 
@@ -137,10 +135,14 @@ const MetricInput = ({ onSubmit, onEdit }) => {
                 return;
             }
 
-            const response = await EmissionService.logEmission({
+            const payload = {
                 inputs: formattedInputs,
+                start_date: startDate,  // Make sure these dates are included
+                end_date: endDate,
                 industry_name: 'default'
-            });
+            };
+
+            const response = await EmissionService.logEmission(payload);
 
             setInputs({}); // Reset form
             if (onSubmit) {
@@ -172,7 +174,6 @@ const MetricInput = ({ onSubmit, onEdit }) => {
     const handleMetricEdit = async (originalName, newName) => {
         setIsLoading(true);
         try {
-            console.log('Updating metric name:', { originalName, newName });
             await EmissionService.updateMetricName(originalName, newName);
 
             // Update local state first
@@ -328,7 +329,12 @@ const MetricInput = ({ onSubmit, onEdit }) => {
             transition={{ duration: 0.3 }}
         >
             <div className={styles.header}>
-                <h3 className={styles.title}>Log New Emissions</h3>
+                <DateRangePicker
+                    startDate={startDate}
+                    endDate={endDate}
+                    onStartDateChange={setStartDate}
+                    onEndDateChange={setEndDate}
+                />
                 <button
                     type="button"
                     className={styles.addMetricBtn}

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { toast } from 'react-toastify'; // Add this import
-import 'react-toastify/dist/ReactToastify.css'; // Ensure toast styles are imported
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { FaTimes, FaEdit, FaCheck } from 'react-icons/fa';
 import styles from '../../styles/components/carbon/unit-selector.module.scss';
 import EmissionService from '../../services/emission.service';

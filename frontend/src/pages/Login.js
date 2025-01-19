@@ -152,13 +152,6 @@ const Login = () => {
         const toastId = toast.loading('Creating your account...');
 
         try {
-            // Add logging to debug the payload
-            console.log('Sending user details:', {
-                ...userDetails,
-                email,
-                password: userDetails.new_password
-            });
-
             await AuthService.completeRegistration({
                 full_name: userDetails.full_name,
                 phone: userDetails.phone,

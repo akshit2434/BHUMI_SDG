@@ -62,7 +62,7 @@ const CustomMetricForm = ({ isOpen, onClose, onSubmit }) => {
                 </div>
                 <div className={styles.formContent}>
                     <div className={styles.formGroup}>
-                        <label>Metric Name:</label>
+                        <label>Metric Name</label>
                         <input
                             type="text"
                             name="metric_name"
@@ -73,7 +73,7 @@ const CustomMetricForm = ({ isOpen, onClose, onSubmit }) => {
                         />
                     </div>
                     <div className={styles.formGroup}>
-                        <label>Unit Name:</label>
+                        <label>Unit Name</label>
                         <input
                             type="text"
                             name="unit_name"
@@ -84,7 +84,7 @@ const CustomMetricForm = ({ isOpen, onClose, onSubmit }) => {
                         />
                     </div>
                     <div className={styles.formGroup}>
-                        <label>Emission Factor (kgCO₂e/unit):</label>
+                        <label>Emission Factor (kgCO₂e/unit)</label>
                         <input
                             type="number"
                             name="emission_factor"
@@ -95,22 +95,22 @@ const CustomMetricForm = ({ isOpen, onClose, onSubmit }) => {
                             className={styles.customInput}
                         />
                     </div>
-                    <div className={styles.modalActions}>
-                        <button
-                            type="button"
-                            onClick={handleFormSubmit}
-                            className={styles.submitBtn}
-                        >
-                            Add Metric
-                        </button>
-                        <button
-                            type="button"
-                            onClick={onClose}
-                            className={styles.cancelBtn}
-                        >
-                            Cancel
-                        </button>
-                    </div>
+                </div>
+                <div className={styles.modalActions}>
+                    <button
+                        type="button"
+                        onClick={handleFormSubmit}
+                        className={styles.submitBtn}
+                    >
+                        Add Metric
+                    </button>
+                    <button
+                        type="button"
+                        onClick={onClose}
+                        className={styles.cancelBtn}
+                    >
+                        Cancel
+                    </button>
                 </div>
             </motion.div>
         </motion.div>
