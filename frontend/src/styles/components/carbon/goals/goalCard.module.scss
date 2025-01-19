@@ -1,0 +1,305 @@
+@import "../../../globals.scss";
+
+.goalCard {
+    @include card-base;
+    padding: 1.5rem;
+    transition: all 0.2s ease;
+    border-left: 4px solid transparent;
+    background: var(--color-surface);
+
+    &:hover {
+        transform: translate(-2px, -2px);
+        box-shadow: 6px 6px 0 var(--color-shadow);
+    }
+
+    &.onTrackGoal {
+        background: rgba(var(--color-success-rgb), 0.05);
+        border-left-color: var(--color-success);
+    }
+
+    &.behindGoal {
+        background: rgba(var(--color-error-rgb), 0.05);
+        border-left-color: var(--color-error);
+    }
+
+    &.achievedGoal {
+        background: rgba(var(--color-success-rgb), 0.1);
+        border-left-color: var(--color-success-dark);
+    }
+
+    &.missedGoal {
+        background: rgba(var(--color-error-rgb), 0.1);
+        border-left-color: var(--color-error-dark);
+        opacity: 0.9;
+    }
+
+    &.notStartedGoal {
+        background: rgba(var(--color-primary-rgb), 0.05);
+        border-left-color: var(--color-primary);
+    }
+
+    &.noDataGoal {
+        background: rgba(var(--color-text-rgb), 0.05);
+        border-left-color: var(--color-text-light);
+    }
+
+    &.warningGoal {
+        background: rgba(var(--color-warning-rgb), 0.05);
+        border-left-color: var(--color-warning);
+    }
+}
+
+.goalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    gap: 1rem;
+
+    .headerMain {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        min-width: 0; // For text truncation
+
+        h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--color-text);
+            margin: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    }
+
+    .actions {
+        display: flex;
+        gap: 0.5rem;
+        flex-shrink: 0;
+
+        button {
+            background: none;
+            border: none;
+            color: var(--color-text);
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: calc(var(--border-radius) / 4);
+            transition: all 0.2s ease;
+
+            &:hover {
+                background: var(--color-background);
+                color: var(--color-primary);
+            }
+        }
+    }
+}
+
+.goalDetails {
+    p {
+        margin-bottom: 0.75rem;
+        color: var(--color-text);
+        font-size: 0.95rem;
+    }
+}
+
+.progressBars {
+    margin: 1rem 0;
+}
+
+.progressBar,
+.timeProgress {
+    background: var(--color-background);
+    border: 1px solid var(--color-shadow);
+    border-radius: calc(var(--border-radius) / 4);
+    height: 24px;
+    margin-bottom: 0.75rem;
+    position: relative;
+    overflow: hidden;
+
+    .progress {
+        height: 100%;
+        transition: width 0.3s ease;
+        position: relative;
+
+        &::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0.1));
+        }
+
+        &.onTrack {
+            background: var(--color-success);
+        }
+
+        &.behind {
+            background: var(--color-error);
+            &::after {
+                background: linear-gradient(rgba(255, 255, 255, 0.3), rgba(0, 0, 0, 0.2));
+            }
+        }
+
+        &.notStarted {
+            background: var(--color-primary-light);
+        }
+
+        &.completed {
+            background: var(--color-success-dark);
+            background-image: linear-gradient(
+                45deg,
+                var(--color-success) 25%,
+                var(--color-success-dark) 25%,
+                var(--color-success-dark) 50%,
+                var(--color-success) 50%,
+                var(--color-success) 75%,
+                var(--color-success-dark) 75%,
+                var(--color-success-dark)
+            );
+            background-size: 20px 20px;
+            animation: progressStripes 1s linear infinite;
+        }
+
+        &.failed {
+            background: var(--color-error-dark);
+            opacity: 0.7;
+        }
+    }
+
+    span {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--color-text);
+        font-size: 0.85rem;
+        font-weight: 700;
+        text-shadow:
+            -1px -1px 0 rgba(255, 255, 255, 1),
+            1px -1px 0 rgba(255, 255, 255, 1),
+            -1px 1px 0 rgba(255, 255, 255, 1),
+            1px 1px 0 rgba(255, 255, 255, 1),
+            0 0 4px rgba(255, 255, 255, 0.8);
+        z-index: 2;
+        letter-spacing: 0.02em;
+    }
+}
+
+.timeProgress {
+    .progress {
+        background: var(--color-primary-light);
+    }
+}
+
+.currentEmissions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--color-shadow);
+
+    .onTrackLabel,
+    .behindLabel {
+        font-size: 0.85rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: calc(var(--border-radius) / 4);
+        margin-left: 0.5rem;
+    }
+
+    .onTrackLabel {
+        background: var(--color-success-light);
+        color: var(--color-success-dark);
+    }
+
+    .behindLabel {
+        background: var(--color-error-light);
+        color: var(--color-error-dark);
+    }
+
+    .warningLabel {
+        font-size: 0.85rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: calc(var(--border-radius) / 4);
+        margin-left: 0.5rem;
+        background: var(--color-warning-light);
+        color: var(--color-warning-dark);
+    }
+}
+
+.currentReduction {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+
+    &.positive {
+        color: #2ecc71;
+    }
+
+    &.negative {
+        color: #e74c3c;
+    }
+}
+
+.increaseIcon,
+.decreaseIcon {
+    font-size: 14px;
+    margin-left: 4px;
+}
+
+.increaseIcon {
+    color: #e74c3c;
+}
+
+.decreaseIcon {
+    color: #2ecc71;
+}
+
+.completedTag {
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--border-radius);
+    background: var(--color-background);
+    color: var(--color-text-light);
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+}
+
+.completedGoal {
+    position: relative;
+    background: var(--color-surface-alt);
+    border: 1px solid var(--color-border);
+
+    .goalHeader {
+        opacity: 0.8;
+    }
+}
+
+.completedSuccess {
+    background: var(--color-success-dark) !important;
+    color: white !important;
+}
+
+.completedFailed {
+    background: var(--color-error-dark) !important;
+    color: white !important;
+}
+
+@keyframes progressStripes {
+    0% {
+        background-position: 0 0;
+    }
+    100% {
+        background-position: 20px 0;
+    }
+}

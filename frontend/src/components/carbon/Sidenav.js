@@ -13,7 +13,7 @@ const Sidenav = ({ activeTab, setActiveTab }) => {
         { id: 'emissions', label: 'History', icon: <FaIndustry /> },
         { id: 'goals', label: 'Goals', icon: <FaPlus /> },
         { id: 'reports', label: 'Reports', icon: <FaFileAlt /> },
-        { id: 'settings', label: 'Settings', icon: <FaCog /> }
+        // { id: 'settings', label: 'Settings', icon: <FaCog /> }
     ];
 
     const handleLogout = () => {

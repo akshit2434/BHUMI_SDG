@@ -1,0 +1,58 @@
+@import "../../globals.scss";
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(2px);
+}
+
+.modal {
+    @include card-base;
+    background: var(--color-surface);
+    width: 100%;
+    max-width: 600px;
+    margin: 20px;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    box-shadow: 8px 8px 0 var(--color-shadow);
+    border: 1px solid var(--color-shadow);
+}
+
+.header {
+    padding: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--color-shadow);
+    background: var(--color-background);
+
+    h3 {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--color-text);
+    }
+}
+
+.content {
+    padding: 0;
+    max-height: calc(80vh - 200px);
+    overflow-y: auto;
+}
+
+.actions {
+    padding: 1.5rem;
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    background: var(--color-background);
+    border-top: 1px solid var(--color-shadow);
+}

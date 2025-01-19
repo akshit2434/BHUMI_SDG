@@ -171,6 +171,101 @@ class GoalsService {
             throw new Error(error.response?.data?.error || 'Failed to fetch emissions for period');
         }
     }
+
+    async calculateGoalProgress(goal) {
+        try {
+            const now = new Date();
+            const startDate = new Date(goal.start_date);
+            const endDate = new Date(goal.end_date);
+
+            if (startDate > now) {
+                return {
+                    goalId: goal._id,
+                    currentEmissions: "0",
+                    reduction: "0.0",
+                    progress: "0.0",
+                    onTrack: true,
+                    notStarted: true
+                };
+            }
+
+            // Get emissions data for calculating daily average
+            const effectiveEndDate = now > endDate ? endDate : now;
+            const emissions = await this.getEmissionsForPeriod(
+                goal.baseline_start_date,
+                goal.baseline_end_date
+            );
+
+            if (!emissions.data || !Array.isArray(emissions.data)) {
+                return {
+                    goalId: goal._id,
+                    currentEmissions: "0",
+                    progress: "0.0",
+                    onTrack: false,
+                    noData: true
+                };
+            }
+
+            // Calculate daily average emissions
+            let totalEmissions = 0;
+            let totalDays = 0;
+
+            emissions.data.forEach(period => {
+                const periodStart = new Date(period.start_date);
+                const periodEnd = new Date(period.end_date);
+                const periodDays = (periodEnd - periodStart) / (1000 * 60 * 60 * 24);
+                totalDays += periodDays;
+                totalEmissions += parseFloat(period.total_emissions || 0);
+            });
+
+            const dailyAverageEmissions = totalDays > 0 ? totalEmissions / totalDays : 0;
+
+            // Calculate emissions for goal period
+            const goalElapsedDays = Math.max(0, Math.min(
+                (effectiveEndDate - startDate) / (1000 * 60 * 60 * 24),
+                (now - startDate) / (1000 * 60 * 60 * 24)
+            ));
+
+            const currentEmissions = Number(dailyAverageEmissions * goalElapsedDays) || 0;
+            const baseline = Number(goal.baseline) || 0;
+            const targetReduction = Number(goal.target_reduction) || 0;
+
+            // Calculate reduction percentage
+            const reduction = baseline > 0 ? ((baseline - currentEmissions) / baseline) * 100 : 0;
+            const progress = targetReduction > 0 ? Math.min(100, (reduction / targetReduction) * 100) : 0;
+
+            // Calculate time progress
+            const totalDuration = endDate - startDate;
+            const elapsed = now - startDate;
+            const timeProgress = Math.min(100, Math.max(0, (elapsed / totalDuration) * 100));
+
+            // Calculate expected progress and status
+            const expectedProgress = targetReduction * (timeProgress / 100);
+            const onTrack = reduction >= expectedProgress;
+            const slightlyBehind = !onTrack && reduction >= (expectedProgress * 0.85);
+
+            return {
+                goalId: goal._id,
+                currentEmissions: currentEmissions.toString(),
+                dailyAverage: dailyAverageEmissions.toFixed(2),
+                reduction: reduction.toFixed(1),
+                progress: Math.max(0, progress).toFixed(1),
+                timeProgress: timeProgress.toFixed(1),
+                expectedProgress: expectedProgress.toFixed(1),
+                slightlyBehind,
+                onTrack
+            };
+        } catch (error) {
+            console.error('Error calculating goal progress:', error);
+            return {
+                goalId: goal._id,
+                currentEmissions: "0",
+                progress: "0",
+                onTrack: false,
+                error: error.message
+            };
+        }
+    }
 }
 
 export default new GoalsService();

@@ -49,6 +49,11 @@ code {
   --color-success: #388e3c;
   --color-danger: rgb(167, 45, 45);
 
+  --color-success-rgb: 46, 204, 113; // RGB values for #2ecc71
+  --color-error-rgb: 231, 76, 60; // RGB values for #e74c3c
+  --color-primary-rgb: 52, 152, 219; // RGB values for #3498db
+  --color-text-rgb: 52, 73, 94; // RGB values for #34495e
+
   --shadow-elevation-1: 0 2px 4px rgba(0, 0, 0, 0.1);
   --shadow-elevation-2: 0 4px 8px rgba(0, 0, 0, 0.12);
   --shadow-elevation-3: 0 8px 16px rgba(0, 0, 0, 0.14);
@@ -67,6 +72,11 @@ code {
   --color-warning-dark: #ef6c00;
   --color-success-light: #e8f5e9;
   --color-success-dark: #2e7d32;
+
+  --color-warning: #f1c40f;
+  --color-warning-rgb: 241, 196, 15;
+  --color-warning-light: #fff3cd;
+  --color-warning-dark: #856404;
 }
 
 // Mixins

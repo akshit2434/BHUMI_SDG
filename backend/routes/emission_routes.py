@@ -514,3 +514,44 @@ def get_emission_ranges():
     except Exception as e:
         print(f"Error fetching emission ranges: {str(e)}")
         return jsonify({'error': str(e)}), 500
+
+# ...existing code...
+
+@emission_bp.route('/emissions', methods=['GET'])
+@jwt_required()
+def get_all_emissions():
+    try:
+        db = get_db()
+        email = get_jwt_identity()
+        user = db.users.find_one({'email': email})
+        
+        if not user:
+            return jsonify({'error': 'User not found'}), 404
+
+        # Get all emissions for the user
+        emissions = list(db.emissions.find(
+            {'user_id': str(user['_id'])}
+        ).sort('end_date', -1))  # Sort by end date, most recent first
+
+        # Format the emissions data
+        formatted_emissions = []
+        for emission in emissions:
+            emission['_id'] = str(emission['_id'])
+            if 'start_date' in emission:
+                emission['start_date'] = emission['start_date'].isoformat()
+            if 'end_date' in emission:
+                emission['end_date'] = emission['end_date'].isoformat()
+            if 'logged_at' in emission:
+                emission['logged_at'] = emission['logged_at'].isoformat()
+            formatted_emissions.append(emission)
+
+        return jsonify({
+            'data': formatted_emissions,
+            'count': len(formatted_emissions)
+        }), 200
+
+    except Exception as e:
+        print(f"Error fetching all emissions: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+# ...rest of existing code...

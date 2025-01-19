@@ -3,7 +3,7 @@ import Sidenav from '../../components/carbon/Sidenav';
 import MetricsGrid from '../../components/carbon/Metric';
 import MetricInput from '../../components/carbon/MetricInput';
 import EmissionHistory from '../../components/carbon/EmissionHistory';
-import Goals from '../../components/carbon/Goals';
+import Goals from '../../components/carbon/Goals/index';
 import styles from '../../styles/components/carbon/dashboard.module.scss';
 
 const Dashboard = () => {

@@ -218,6 +218,26 @@ class EmissionService {
         }
     }
 
+    async getAllEmissions() {
+        try {
+            const response = await axios.get(`${API_URL}/emissions`, {
+                withCredentials: true,
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+
+            if (!response.data) {
+                throw new Error('No data received from server');
+            }
+
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching emissions:', error.response?.data || error);
+            throw new Error(error.response?.data?.error || 'Failed to fetch emissions');
+        }
+    }
+
     calculateTotalEmissions(inputs, units) {
         let total = 0;
 

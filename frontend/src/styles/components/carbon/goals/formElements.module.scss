@@ -1,0 +1,50 @@
+@import "../../../globals";
+
+.formGroup {
+    margin-bottom: 1.25rem;
+
+    label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: var(--color-text);
+        font-size: 0.95rem;
+    }
+
+    input,
+    textarea,
+    select {
+        @include input-base;
+        padding: 0.75rem;
+        background: var(--color-background);
+        border: 1px solid var(--color-shadow);
+        font-size: 0.95rem;
+
+        &:focus {
+            transform: translate(-2px, -2px);
+            box-shadow: 4px 4px 0 var(--color-shadow);
+        }
+    }
+
+    textarea {
+        min-height: 100px;
+        resize: vertical;
+    }
+
+    .errorText {
+        color: var(--color-error-dark);
+        font-size: 0.875rem;
+        margin-top: 0.5rem;
+    }
+}
+
+.formGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.required {
+    color: var(--color-error);
+    margin-left: 0.25rem;
+}
