@@ -42,7 +42,7 @@ const Login = () => {
     }, [navigate]);
 
     const validatePassword = (password) => {
-        const regex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+        const regex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{8,}$/;
         if (!regex.test(password)) {
             return "Password must be at least 8 characters long and contain both letters and numbers";
         }
@@ -114,6 +114,11 @@ const Login = () => {
 
         try {
             await AuthService.register(email);
+            // Set the initial password from login form
+            setUserDetails(prev => ({
+                ...prev,
+                new_password: password,
+            }));
             toast.update(toastId, {
                 render: 'Please complete your profile',
                 type: 'success',
