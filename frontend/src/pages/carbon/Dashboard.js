@@ -3,6 +3,7 @@ import Sidenav from '../../components/carbon/Sidenav';
 import MetricsGrid from '../../components/carbon/Metric';
 import MetricInput from '../../components/carbon/MetricInput';
 import EmissionHistory from '../../components/carbon/EmissionHistory';
+import Goals from '../../components/carbon/Goals';
 import styles from '../../styles/components/carbon/dashboard.module.scss';
 
 const Dashboard = () => {
@@ -32,11 +33,18 @@ const Dashboard = () => {
                 return (
                     <div key={refreshKey} className={styles.dashboardContent}>
                         <MetricsGrid />
+                    </div>
+                );
+            case 'log':
+                return (
+                    <div key={refreshKey} className={styles.dashboardContent}>
                         <MetricInput onSubmit={handleEmissionSubmit} onEdit={handleMetricEdit} />
                     </div>
                 );
             case 'emissions':
                 return <EmissionHistory />;
+            case 'goals':
+                return <Goals />;
             case 'reports':
                 return <div>Reports</div>;
             default:

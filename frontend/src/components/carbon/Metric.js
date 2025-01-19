@@ -23,10 +23,10 @@ const Metric = ({ title, value, unit, type }) => {
 
 const MetricsGrid = () => {
     const [metrics, setMetrics] = useState([
-        { title: 'Total CO₂ Emissions', value: '0', unit: 'tonnes CO₂e' },
-        { title: 'Current Month', value: '0', unit: 'tonnes CO₂e' },
-        { title: 'YoY Change', value: '0%', unit: 'vs last year', type: 'neutral' },
-        { title: 'Target Status', value: 'Calculating', unit: '2025 goal', type: 'neutral' }
+        { title: 'Total CO₂ Emissions', value: 'N/A', unit: 'tonnes CO₂e' },
+        { title: 'Current Month', value: 'N/A', unit: 'tonnes CO₂e' },
+        { title: 'YoY Change', value: 'N/A', unit: 'vs last year', type: 'neutral' },
+        { title: 'Target Status', value: 'N/A', unit: '2025 goal', type: 'neutral' }
     ]);
 
     useEffect(() => {
@@ -53,33 +53,54 @@ const MetricsGrid = () => {
                         return emissionDate.getFullYear() === currentDate.getFullYear() - 1;
                     }).reduce((sum, e) => sum + e.total_emissions, 0);
 
-                    const yoyChange = lastYearEmissions ?
-                        ((currentMonthEmissions - lastYearEmissions) / lastYearEmissions * 100).toFixed(1) : 0;
-
-                    setMetrics([
+                    // Prepare metrics with proper N/A handling
+                    const updatedMetrics = [
                         {
                             title: 'Total CO₂ Emissions',
-                            value: (totalEmissions / 1000).toFixed(1),
+                            value: totalEmissions ? (totalEmissions / 1000).toFixed(1) : 'N/A',
                             unit: 'tonnes CO₂e'
                         },
                         {
                             title: 'Current Month',
-                            value: (currentMonthEmissions / 1000).toFixed(1),
+                            value: currentMonthEmissions ? (currentMonthEmissions / 1000).toFixed(1) : 'N/A',
                             unit: 'tonnes CO₂e'
-                        },
-                        {
+                        }
+                    ];
+
+                    // Only add YoY change if we have last year's data
+                    if (lastYearEmissions) {
+                        const yoyChange = ((currentMonthEmissions - lastYearEmissions) / lastYearEmissions * 100).toFixed(1);
+                        updatedMetrics.push({
                             title: 'YoY Change',
                             value: `${yoyChange}%`,
                             unit: 'vs last year',
                             type: yoyChange < 0 ? 'reduction' : yoyChange > 0 ? 'increase' : 'neutral'
-                        },
-                        {
+                        });
+
+                        updatedMetrics.push({
                             title: 'Target Status',
                             value: yoyChange < 0 ? 'On Track' : 'Need Action',
                             unit: '2025 goal',
                             type: yoyChange < 0 ? 'onTrack' : 'needAction'
-                        }
-                    ]);
+                        });
+                    } else {
+                        updatedMetrics.push(
+                            {
+                                title: 'YoY Change',
+                                value: 'N/A',
+                                unit: 'vs last year',
+                                type: 'neutral'
+                            },
+                            {
+                                title: 'Target Status',
+                                value: 'N/A',
+                                unit: '2025 goal',
+                                type: 'neutral'
+                            }
+                        );
+                    }
+
+                    setMetrics(updatedMetrics);
                 }
             } catch (error) {
                 console.error('Failed to fetch metrics:', error);
@@ -96,10 +117,12 @@ const MetricsGrid = () => {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.4 }}
         >
-            {metrics.map((metric, index) => (
-                <Metric key={index} {...metric} />
-            ))}
-        </motion.div>
+            {
+                metrics.map((metric, index) => (
+                    <Metric key={index} {...metric} />
+                ))
+            }
+        </motion.div >
     );
 };
 

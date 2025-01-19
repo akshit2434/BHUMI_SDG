@@ -281,35 +281,40 @@
 }
 
 .formContent {
+    padding: 1.5rem;
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
-    margin-top: 1rem;
+    background: var(--color-surface);
 }
 
 .formGroup {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.75rem;
 
     label {
         font-weight: 600;
         color: var(--color-text);
-        font-size: 0.9rem;
+        font-size: 1rem;
     }
 }
 
 .customInput {
     @include input-base;
+    width: 100%;
     padding: 0.75rem;
     border: 1px solid var(--color-shadow);
     border-radius: calc(var(--border-radius) / 4);
+    font-size: 1rem;
+    background: var(--color-background);
     transition: all 0.2s ease;
 
     &:focus {
         outline: none;
         transform: translate(-2px, -2px);
-        box-shadow: 4px 4px 0 var(--color-shadow);
+        box-shadow: 2px 2px 0 var(--color-shadow);
+        border-color: var(--color-primary);
     }
 }
 
@@ -317,29 +322,55 @@
     display: flex;
     justify-content: flex-end;
     gap: 1rem;
-    margin-top: 1rem;
-}
+    padding: 1.5rem;
+    background: var(--color-background);
+    border-top: 1px solid var(--color-shadow);
 
-.submitBtn {
-    @include button-base;
-    padding: 0.75rem 1.5rem;
-    width: auto;
-    background: var(--color-primary);
-}
-
-.cancelBtn {
-    padding: 0.75rem 1.5rem;
-    border: 1px solid var(--color-shadow);
-    border-radius: calc(var(--border-radius) / 4);
-    background: var(--color-surface);
-    color: var(--color-text);
-    cursor: pointer;
-    font-weight: 500;
-    transition: all 0.2s ease;
-
-    &:hover {
-        background: var(--color-background);
-        transform: translate(-1px, -1px);
+    .submitBtn {
+        padding: 0.75rem 1.5rem;
+        background: var(--color-primary);
+        color: white;
+        border: 1px solid var(--color-shadow);
+        border-radius: calc(var(--border-radius) / 4);
+        font-size: 0.9rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
         box-shadow: 2px 2px 0 var(--color-shadow);
+
+        &:hover {
+            background: var(--color-primary-light);
+            transform: translate(-1px, -1px);
+            box-shadow: 3px 3px 0 var(--color-shadow);
+        }
+
+        &:active {
+            transform: translate(0, 0);
+            box-shadow: 1px 1px 0 var (--color-shadow);
+        }
+    }
+
+    .cancelBtn {
+        padding: 0.75rem 1.5rem;
+        background: var(--color-surface);
+        color: var(--color-text);
+        border: 1px solid var(--color-shadow);
+        border-radius: calc(var(--border-radius) / 4);
+        font-size: 0.9rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        box-shadow: 2px 2px 0 var(--color-shadow);
+
+        &:hover {
+            background: var(--color-background);
+            transform: translate(-1px, -1px);
+            box-shadow: 3px 3px 0 var(--color-shadow);
+        }
+
+        &:active {
+            transform: translate(0, 0);
+            box-shadow: 1px 1px 0 var(--color-shadow);
+        }
     }
 }

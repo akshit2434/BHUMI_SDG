@@ -5,8 +5,6 @@ const ApiTest = () => {
     const [message, setMessage] = useState('');
     const [error, setError] = useState('');
 
-    console.log('API URL:', process.env.REACT_APP_API_URL); // Debug log
-
     useEffect(() => {
         const fetchData = async () => {
             try {

@@ -10,8 +10,35 @@ const formatEmissionValue = (input) => {
     return `${input.value} ${input.unit} (${input.emission_factor} kgCO₂e/${input.unit})`;
 };
 
+const formatEmissions = (emissions) => {
+    const tonnage = emissions / 1000; // Convert from kg to tonnes
+    if (tonnage < 0.1) {
+        return `${emissions.toFixed(1)} kg CO₂e`;
+    }
+    return `${tonnage.toFixed(2)} tonnes CO₂e`;
+};
+
+const calculateDaysBetween = (startDate, endDate) => {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const diffTime = Math.abs(end - start);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
+};
+
+const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+    });
+};
+
 const EmissionCard = ({ emission }) => {
     const [isExpanded, setIsExpanded] = useState(false);
+
+    const periodDays = calculateDaysBetween(emission.start_date, emission.end_date);
+    const dailyEmissions = emission.total_emissions / periodDays;
 
     return (
         <motion.div
@@ -21,17 +48,23 @@ const EmissionCard = ({ emission }) => {
         >
             <div className={styles.cardHeader}>
                 <div className={styles.headerInfo}>
-                    <span className={styles.date}>
-                        {new Date(emission.logged_at).toLocaleDateString()}
-                    </span>
-                    <span className={styles.time}>
-                        {new Date(emission.logged_at).toLocaleTimeString()}
-                    </span>
+                    <div className={styles.period}>
+                        <span className={styles.periodLabel}>Period:</span>
+                        <span className={styles.dates}>
+                            {formatDate(emission.start_date)} - {formatDate(emission.end_date)}
+                        </span>
+                        <span className={styles.duration}>({periodDays} days)</span>
+                    </div>
+                    <div className={styles.emissions}>
+                        <span className={styles.total}>
+                            Total: {formatEmissions(emission.total_emissions)}
+                        </span>
+                        <span className={styles.daily}>
+                            Daily Avg: {formatEmissions(dailyEmissions)}
+                        </span>
+                    </div>
                 </div>
                 <div className={styles.headerControls}>
-                    <span className={styles.total}>
-                        {(emission.total_emissions / 1000).toFixed(2)} tonnes CO₂e
-                    </span>
                     <FaChevronDown
                         className={`${styles.expandIcon} ${isExpanded ? styles.expanded : ''}`}
                     />
@@ -56,15 +89,16 @@ const EmissionCard = ({ emission }) => {
                                         {formatEmissionValue(data)}
                                     </span>
                                     <span className={styles.sourceEmissions}>
-                                        {(data.value * data.emission_factor).toFixed(2)} kgCO₂e
+                                        {formatEmissions(data.value * data.emission_factor)}
                                     </span>
                                 </div>
                             ))}
                         </div>
                     </motion.div>
-                )}
-            </AnimatePresence>
-        </motion.div>
+                )
+                }
+            </AnimatePresence >
+        </motion.div >
     );
 };
 
@@ -114,8 +148,6 @@ const EmissionHistory = () => {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.3 }}
         >
-            <h2>Emission History</h2>
-
             {history.length === 0 ? (
                 <div className={styles.emptyState}>
                     <p>No emission records found</p>

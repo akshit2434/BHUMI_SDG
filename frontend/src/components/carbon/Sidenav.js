@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaIndustry, FaChartLine, FaFileAlt, FaUsers, FaCog, FaSignOutAlt } from 'react-icons/fa';
+import { FaIndustry, FaChartLine, FaFileAlt, FaUsers, FaCog, FaSignOutAlt, FaPlus } from 'react-icons/fa';
 import AuthService from '../../services/auth.service';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -9,9 +9,10 @@ const Sidenav = ({ activeTab, setActiveTab }) => {
     const navigate = useNavigate();
     const sidebarItems = [
         { id: 'overview', label: 'Overview', icon: <FaChartLine /> },
-        { id: 'emissions', label: 'Emissions Log', icon: <FaIndustry /> },
+        { id: 'log', label: 'Log Emissions', icon: <FaPlus /> },
+        { id: 'emissions', label: 'History', icon: <FaIndustry /> },
+        { id: 'goals', label: 'Goals', icon: <FaPlus /> },
         { id: 'reports', label: 'Reports', icon: <FaFileAlt /> },
-        { id: 'team', label: 'Team', icon: <FaUsers /> },
         { id: 'settings', label: 'Settings', icon: <FaCog /> }
     ];
 

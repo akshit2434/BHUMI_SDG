@@ -51,9 +51,11 @@ except Exception as e:
 app.config['DATABASE'] = db
 
 from routes.emission_routes import emission_bp
+from routes.goal_routes import goal_bp
 
 # Add blueprint registration after CORS setup
 app.register_blueprint(emission_bp)
+app.register_blueprint(goal_bp)
 
 # Add before jwt_required endpoints
 @app.before_request
@@ -124,7 +126,7 @@ def complete_registration():
     missing_fields = [field for field in required_fields if field not in data]
     if missing_fields:
         return jsonify({
-            "error": f"Missing required fields: {', '.join(missing_fields)}"
+            "error": f"Missing rr required fields: {', '.join(missing_fields)}"
         }), 400
     
     # Double-check email matches token
@@ -219,7 +221,7 @@ def update_user_details():
     
     required_fields = ['full_name', 'phone', 'organization', 'industry', 'password']
     if not all(field in data for field in required_fields):
-        return jsonify({"error": "Missing required fields"}), 400
+        return jsonify({"error": "Missing rar required fields"}), 400
     
     # Validate industry type
     valid_industries = ['Manufacturing', 'Agriculture', 'Textile', 'Other']

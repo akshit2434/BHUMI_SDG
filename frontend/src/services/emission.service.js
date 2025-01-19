@@ -26,6 +26,8 @@ class EmissionService {
                 `${API_URL}/emissions/log`,
                 {
                     inputs: transformedInputs,
+                    start_date: emissionData.start_date,
+                    end_date: emissionData.end_date,
                     industry_name: emissionData.industry_name || 'default'
                 },
                 {
@@ -50,37 +52,36 @@ class EmissionService {
 
     async getEmissionHistory(page = 1, limit = 10) {
         try {
-            console.log('Fetching emission history...');
             const response = await axios.get(
                 `${API_URL}/emissions/history?page=${page}&limit=${limit}`,
                 { withCredentials: true }
             );
 
-            if (!response.data || !Array.isArray(response.data.emissions)) {
-                throw new Error('Invalid response format');
+            // Check if response exists
+            if (!response || !response.data) {
+                throw new Error('No response received from server');
             }
 
+            // Check if emissions array exists, if not, provide empty array
+            const emissions = response.data.emissions || [];
+            const total = response.data.total || 0;
+            const pages = response.data.pages || 1;
+
             return {
-                emissions: response.data.emissions,
-                total: response.data.total,
-                pages: response.data.pages
+                emissions,
+                total,
+                pages
             };
         } catch (error) {
-            console.error('Error fetching history:', error.response?.data || error);
-            throw new Error(error.response?.data?.message || 'Failed to fetch emission history');
+            console.error('Error fetching history:', error);
+            const errorMessage = error.response?.data?.message || error.message || 'Failed to fetch emission history';
+            throw new Error(errorMessage);
         }
     }
 
     async getUserUnits() {
         try {
-            console.log('Fetching user units...');
             const response = await axios.get(`${API_URL}/units`, { withCredentials: true });
-
-            console.group('EmissionService - getUserUnits Response');
-            console.log('Raw Response:', response);
-            console.log('Response Data:', response.data);
-            console.log('Metrics Array:', response.data.metrics);
-            console.groupEnd();
 
             if (!response.data || !Array.isArray(response.data.metrics)) {
                 console.error('Invalid response format:', response.data);
@@ -126,7 +127,6 @@ class EmissionService {
 
     async updateMetricName(originalName, newName) {
         try {
-            console.log('Updating metric name:', { originalName, newName });
             const response = await axios.put(
                 `${API_URL}/emissions/metrics`,
                 {
@@ -154,7 +154,6 @@ class EmissionService {
 
     async deleteMetric(name) {
         try {
-            console.log('Deleting metric:', name);
             const response = await axios.delete(
                 `${API_URL}/emissions/metrics`,
                 {
@@ -198,6 +197,24 @@ class EmissionService {
         } catch (error) {
             console.error('Error adding custom metric:', error);
             throw new Error(error.response?.data?.error || error.message || 'Failed to add custom metric');
+        }
+    }
+
+    async getEmissionRanges() {
+        try {
+            const response = await axios.get(
+                `${API_URL}/emissions/ranges`,
+                { withCredentials: true }
+            );
+
+            if (!response.data || !Array.isArray(response.data.ranges)) {
+                throw new Error('Invalid ranges data format');
+            }
+
+            return response.data.ranges;
+        } catch (error) {
+            console.error('Error fetching emission ranges:', error);
+            throw new Error(error.response?.data?.error || 'Failed to fetch emission ranges');
         }
     }
 
