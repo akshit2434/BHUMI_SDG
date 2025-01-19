@@ -1,32 +1,105 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import EmissionService from '../../services/emission.service';
 import styles from '../../styles/components/carbon/metrics.module.scss';
 
 const Metric = ({ title, value, unit, type }) => {
     return (
-        <div className={styles.metricCard}>
+        <motion.div
+            className={styles.metricCard}
+            whileHover={{
+                y: -4,
+                transition: { duration: 0.2, ease: "easeOut" }
+            }}
+        >
             <h3 className={styles.title}>{title}</h3>
             <p className={`${styles.value} ${type ? styles[type] : ''}`}>
                 {value}
             </p>
             <p className={styles.unit}>{unit}</p>
-        </div>
+        </motion.div>
     );
 };
 
 const MetricsGrid = () => {
-    const metrics = [
-        { title: 'Total CO₂ Emissions', value: '245.8', unit: 'tonnes CO₂e' },
-        { title: 'Current Month', value: '18.3', unit: 'tonnes CO₂e' },
-        { title: 'YoY Change', value: '-12.4%', unit: 'vs last year', type: 'reduction' },
-        { title: 'Target Status', value: 'On Track', unit: '2024 goal', type: 'onTrack' }
-    ];
+    const [metrics, setMetrics] = useState([
+        { title: 'Total CO₂ Emissions', value: '0', unit: 'tonnes CO₂e' },
+        { title: 'Current Month', value: '0', unit: 'tonnes CO₂e' },
+        { title: 'YoY Change', value: '0%', unit: 'vs last year', type: 'neutral' },
+        { title: 'Target Status', value: 'Calculating', unit: '2025 goal', type: 'neutral' }
+    ]);
+
+    useEffect(() => {
+        const fetchMetrics = async () => {
+            try {
+                const history = await EmissionService.getEmissionHistory();
+                const emissions = history.emissions;
+
+                if (emissions && emissions.length > 0) {
+                    // Calculate total emissions
+                    const totalEmissions = emissions.reduce((sum, e) => sum + e.total_emissions, 0);
+
+                    // Calculate current month emissions
+                    const currentDate = new Date();
+                    const currentMonthEmissions = emissions.filter(e => {
+                        const emissionDate = new Date(e.logged_at);
+                        return emissionDate.getMonth() === currentDate.getMonth() &&
+                            emissionDate.getFullYear() === currentDate.getFullYear();
+                    }).reduce((sum, e) => sum + e.total_emissions, 0);
+
+                    // Calculate YoY change
+                    const lastYearEmissions = emissions.filter(e => {
+                        const emissionDate = new Date(e.logged_at);
+                        return emissionDate.getFullYear() === currentDate.getFullYear() - 1;
+                    }).reduce((sum, e) => sum + e.total_emissions, 0);
+
+                    const yoyChange = lastYearEmissions ?
+                        ((currentMonthEmissions - lastYearEmissions) / lastYearEmissions * 100).toFixed(1) : 0;
+
+                    setMetrics([
+                        {
+                            title: 'Total CO₂ Emissions',
+                            value: (totalEmissions / 1000).toFixed(1),
+                            unit: 'tonnes CO₂e'
+                        },
+                        {
+                            title: 'Current Month',
+                            value: (currentMonthEmissions / 1000).toFixed(1),
+                            unit: 'tonnes CO₂e'
+                        },
+                        {
+                            title: 'YoY Change',
+                            value: `${yoyChange}%`,
+                            unit: 'vs last year',
+                            type: yoyChange < 0 ? 'reduction' : yoyChange > 0 ? 'increase' : 'neutral'
+                        },
+                        {
+                            title: 'Target Status',
+                            value: yoyChange < 0 ? 'On Track' : 'Need Action',
+                            unit: '2025 goal',
+                            type: yoyChange < 0 ? 'onTrack' : 'needAction'
+                        }
+                    ]);
+                }
+            } catch (error) {
+                console.error('Failed to fetch metrics:', error);
+            }
+        };
+
+        fetchMetrics();
+    }, []);
 
     return (
-        <div className={styles.metricsGrid}>
+        <motion.div
+            className={styles.metricsGrid}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.4 }}
+        >
             {metrics.map((metric, index) => (
                 <Metric key={index} {...metric} />
             ))}
-        </div>
+        </motion.div>
     );
 };
 

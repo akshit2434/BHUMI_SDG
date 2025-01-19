@@ -1,4 +1,4 @@
-@import "../../globals.scss";
+@import "../../globals";
 
 .metricsGrid {
     display: grid;
@@ -10,12 +10,6 @@
 .metricCard {
     @include card-base;
     padding: 1.5rem;
-    transition: all 0.2s ease;
-
-    &:hover {
-        transform: translate(-3px, -3px);
-        box-shadow: 7px 7px 0 var(--color-shadow);
-    }
 }
 
 .title {

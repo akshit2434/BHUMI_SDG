@@ -1,0 +1,345 @@
+@import "../../globals";
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(2px);
+}
+
+.modal {
+    @include card-base;
+    background: var(--color-surface);
+    width: 100%;
+    max-width: 500px;
+    min-width: 320px;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+    margin: 20px;
+    padding: 0; // Remove padding from modal
+    width: 90%;
+    margin: 2rem auto;
+    box-shadow: 8px 8px 0 var(--color-shadow);
+    border: 1px solid var(--color-shadow);
+    margin: 0;
+    overflow: hidden;
+}
+
+.loaderContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100px;
+    width: 100%;
+}
+
+.modalContent {
+    min-width: 200px;
+    min-height: 100px;
+}
+
+.header {
+    padding: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--color-shadow);
+    background: var(--color-background);
+
+    h3 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--color-text);
+    }
+}
+
+.closeBtn {
+    background: none;
+    border: none;
+    color: var(--color-text);
+    cursor: pointer;
+    padding: 0.5rem;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+
+    &:hover {
+        opacity: 1;
+    }
+}
+
+.content {
+    padding: 1.5rem; // Move padding to content
+    max-height: calc(80vh - 100px);
+    overflow-y: auto;
+}
+
+.tableHeader {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    padding: 0.75rem 1rem;
+    font-weight: 600;
+    color: var(--color-text);
+    border-bottom: 1px solid var(--color-shadow);
+}
+
+.unitList {
+    max-height: 300px;
+    overflow-y: auto;
+    background: var(--color-surface);
+}
+
+.unitRow {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+
+    &:hover {
+        background: var(--color-background);
+    }
+
+    &.active {
+        background: var(--color-primary-light);
+        color: var(--color-text);
+    }
+}
+
+.rateSection {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.rateEdit {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 1;
+}
+
+.rateInput {
+    @include input-base;
+    width: 120px;
+    padding: 0.4rem 0.75rem;
+    text-align: right;
+}
+
+.editBtn,
+.saveBtn,
+.closeBtn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    opacity: 0.6;
+    color: var(--color-text);
+    transition: opacity 0.2s;
+
+    &:hover {
+        opacity: 1;
+    }
+}
+
+.saveBtn {
+    color: var(--color-success);
+}
+
+.addCustomUnit {
+    margin-top: 0; // Remove top margin
+    border-top: 1px solid var(--color-shadow);
+    padding: 1.5rem;
+    background: var(--color-background);
+}
+
+.customUnitForm {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 1rem;
+    align-items: start;
+    padding: 1rem;
+    background: var(--color-background);
+    border-radius: calc(var(--border-radius) / 4);
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+
+    input {
+        @include input-base;
+        margin: 0;
+        flex: 1;
+        min-width: 0;
+        padding: 0.75rem;
+        border: 1px solid var(--color-shadow);
+        border-radius: calc(var(--border-radius) / 4);
+        background: var(--color-surface);
+
+        &:focus {
+            outline: none;
+            transform: translate(-2px, -2px);
+            box-shadow: 2px 2px 0 var(--color-shadow);
+        }
+    }
+}
+
+.addCustomBtn {
+    @include button-base;
+    padding: 0.75rem 1.25rem;
+    width: auto;
+    height: 100%;
+    font-size: 1rem;
+    padding: 0.75rem 1.5rem;
+    background: var(--color-primary);
+    color: white;
+    border: 1px solid var(--color-shadow);
+    border-radius: calc(var(--border-radius) / 4);
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+    box-shadow: 2px 2px 0 var(--color-shadow);
+
+    &:hover {
+        background: var(--color-primary-light);
+        transform: translate(-1px, -1px);
+        box-shadow: 3px 3px 0 var(--color-shadow);
+    }
+
+    &:active {
+        transform: translate(0, 0);
+        box-shadow: 1px 1px 0 var(--color-shadow);
+    }
+}
+
+.input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--color-shadow);
+    border-radius: calc(var(--border-radius) / 4);
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    background: var(--color-background);
+
+    &:focus {
+        outline: none;
+        border-color: var(--color-primary);
+        box-shadow: 0 0 0 2px var(--color-primary-light);
+    }
+}
+
+.actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+
+    button {
+        padding: 8px 16px;
+        border-radius: calc(var(--border-radius) / 4);
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        &.saveBtn {
+            background: var(--color-primary);
+            color: white;
+            border: none;
+
+            &:hover {
+                background: var(--color-primary-light);
+            }
+        }
+
+        &.deleteBtn {
+            background: var(--color-danger);
+            color: white;
+            border: none;
+
+            &:hover {
+                background: var(--color-danger-dark);
+            }
+        }
+
+        &.cancelBtn {
+            background: transparent;
+            border: 1px solid var(--color-shadow);
+
+            &:hover {
+                background: var(--color-background);
+            }
+        }
+    }
+}
+
+.formContent {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    label {
+        font-weight: 600;
+        color: var(--color-text);
+        font-size: 0.9rem;
+    }
+}
+
+.customInput {
+    @include input-base;
+    padding: 0.75rem;
+    border: 1px solid var(--color-shadow);
+    border-radius: calc(var(--border-radius) / 4);
+    transition: all 0.2s ease;
+
+    &:focus {
+        outline: none;
+        transform: translate(-2px, -2px);
+        box-shadow: 4px 4px 0 var(--color-shadow);
+    }
+}
+
+.modalActions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.submitBtn {
+    @include button-base;
+    padding: 0.75rem 1.5rem;
+    width: auto;
+    background: var(--color-primary);
+}
+
+.cancelBtn {
+    padding: 0.75rem 1.5rem;
+    border: 1px solid var(--color-shadow);
+    border-radius: calc(var(--border-radius) / 4);
+    background: var(--color-surface);
+    color: var(--color-text);
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+
+    &:hover {
+        background: var(--color-background);
+        transform: translate(-1px, -1px);
+        box-shadow: 2px 2px 0 var(--color-shadow);
+    }
+}

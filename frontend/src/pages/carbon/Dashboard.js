@@ -2,28 +2,41 @@ import React, { useState } from 'react';
 import Sidenav from '../../components/carbon/Sidenav';
 import MetricsGrid from '../../components/carbon/Metric';
 import MetricInput from '../../components/carbon/MetricInput';
+import EmissionHistory from '../../components/carbon/EmissionHistory';
 import styles from '../../styles/components/carbon/dashboard.module.scss';
 
 const Dashboard = () => {
     const [activeTab, setActiveTab] = useState('overview');
+    const [refreshKey, setRefreshKey] = useState(0);
 
-    const handleEmissionSubmit = async (data) => {
-        // TODO: Implement API call
-        console.log('Emission data:', data);
-        await new Promise(resolve => setTimeout(resolve, 1500)); // Simulated delay
+    const handleEmissionSubmit = async (response) => {
+        try {
+            // Trigger a refresh by updating the refreshKey
+            setRefreshKey(oldKey => oldKey + 1);
+        } catch (error) {
+            console.error('Error handling emission submission:', error);
+        }
+    };
+
+    const handleMetricEdit = async (response) => {
+        try {
+            setRefreshKey(oldKey => oldKey + 1);
+        } catch (error) {
+            console.error('Error handling metric edit:', error);
+        }
     };
 
     const renderContent = () => {
         switch (activeTab) {
             case 'overview':
                 return (
-                    <div className={styles.dashboardContent}>
+                    <div key={refreshKey} className={styles.dashboardContent}>
                         <MetricsGrid />
-                        <MetricInput onSubmit={handleEmissionSubmit} />
+                        <MetricInput onSubmit={handleEmissionSubmit} onEdit={handleMetricEdit} />
                     </div>
                 );
             case 'emissions':
-                return <div>Emissions Log</div>;
+                return <EmissionHistory />;
             case 'reports':
                 return <div>Reports</div>;
             default:

@@ -2,6 +2,7 @@ import React from 'react';
 import { FaIndustry, FaChartLine, FaFileAlt, FaUsers, FaCog, FaSignOutAlt } from 'react-icons/fa';
 import AuthService from '../../services/auth.service';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import styles from '../../styles/components/carbon/sidenav.module.scss';
 
 const Sidenav = ({ activeTab, setActiveTab }) => {
@@ -20,32 +21,45 @@ const Sidenav = ({ activeTab, setActiveTab }) => {
     };
 
     return (
-        <nav className={styles.sidebar}>
+        <motion.nav
+            className={styles.sidebar}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3 }}
+        >
             <div className={styles.logo}>
                 <FaIndustry />
                 <span>CarbonTrack</span>
             </div>
-            <div className={styles.userInfo}>
+            {/* <div className={styles.userInfo}>
                 <div className={styles.avatar}></div>
                 <span>Welcome, Admin</span>
-            </div>
+            </div> */}
             <ul className={styles.navList}>
-                {sidebarItems.map(item => (
-                    <li
+                {sidebarItems.map((item) => (
+                    <motion.li
                         key={item.id}
                         className={`${styles.navItem} ${activeTab === item.id ? styles.active : ''}`}
                         onClick={() => setActiveTab(item.id)}
+                        whileHover={{ x: 4 }}
+                        whileTap={{ scale: 0.98 }}
+                        transition={{ duration: 0.1 }}
                     >
                         {item.icon}
                         <span>{item.label}</span>
-                    </li>
+                    </motion.li>
                 ))}
             </ul>
-            <button className={styles.logoutBtn} onClick={handleLogout}>
+            <motion.button
+                className={styles.logoutBtn}
+                onClick={handleLogout}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+            >
                 <FaSignOutAlt />
                 <span>Logout</span>
-            </button>
-        </nav>
+            </motion.button>
+        </motion.nav>
     );
 };
 

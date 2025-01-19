@@ -58,6 +58,11 @@
         transform: translate(-2px, -2px);
         box-shadow: 6px 6px 0 var(--color-shadow);
     }
+
+    &.error {
+        border-color: var(--color-error);
+        box-shadow: 4px 4px 0 rgba(255, 0, 0, 0.2);
+    }
 }
 
 .submit-button {
@@ -165,4 +170,11 @@
 
 .Toastify__progress-bar {
     background: rgba(255, 255, 255, 0.2);
+}
+
+.error-text {
+    color: var(--color-error);
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+    display: block;
 }

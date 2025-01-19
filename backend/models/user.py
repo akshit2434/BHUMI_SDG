@@ -7,6 +7,7 @@ class User:
         self.full_name = kwargs.get('full_name', '')
         self.phone = kwargs.get('phone', '')
         self.organization = kwargs.get('organization', '')
+        self.industry = kwargs.get('industry', 'Manufacturing')
         self.role = kwargs.get('role', 'user')
         self.is_details_filled = kwargs.get('is_details_filled', False)
         self.created_at = kwargs.get('created_at', datetime.utcnow())
@@ -18,6 +19,7 @@ class User:
             'full_name': self.full_name,
             'phone': self.phone,
             'organization': self.organization,
+            'industry': self.industry,
             'role': self.role,
             'is_details_filled': self.is_details_filled,
             'created_at': self.created_at
