@@ -10,6 +10,8 @@ const AddProduct = () => {
     const [price_per_unit, setPricePerUnit] = useState('');
     const [unit, setUnit] = useState('');
     const [contactInfo, setContactInfo] = useState('');
+    const [availableUnits, setAvailableUnits] = useState('');
+    const [userName, setUserName] = useState('');
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -20,6 +22,8 @@ const AddProduct = () => {
                 price_per_unit: parseFloat(price_per_unit),
                 unit,
                 contact: contactInfo,
+                available_units: parseFloat(availableUnits),
+                user_name: userName,
             });
 
             toast.success('Product listed successfully!');
@@ -29,6 +33,8 @@ const AddProduct = () => {
             setPricePerUnit('');
             setUnit('');
             setContactInfo('');
+            setAvailableUnits('');
+            setUserName('');
         } catch (error) {
             console.error('Error adding product:', error);
             toast.error(error.message || 'Failed to list product');
@@ -58,23 +64,45 @@ const AddProduct = () => {
                         required
                     />
                 </div>
+                <div className={styles.formRow}>
+                    <div className={styles.formGroup}>
+                        <label htmlFor="price_per_unit">Price Per Unit</label>
+                        <input
+                            type="number"
+                            id="price_per_unit"
+                            value={price_per_unit}
+                            onChange={(e) => setPricePerUnit(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <div className={styles.formGroup}>
+                        <label htmlFor="unit">Unit</label>
+                        <input
+                            type="text"
+                            id="unit"
+                            value={unit}
+                            onChange={(e) => setUnit(e.target.value)}
+                            required
+                        />
+                    </div>
+                </div>
                 <div className={styles.formGroup}>
-                    <label htmlFor="price_per_unit">Price Per Unit</label>
+                    <label htmlFor="available_units">Available Units</label>
                     <input
                         type="number"
-                        id="price_per_unit"
-                        value={price_per_unit}
-                        onChange={(e) => setPricePerUnit(e.target.value)}
+                        id="available_units"
+                        value={availableUnits}
+                        onChange={(e) => setAvailableUnits(e.target.value)}
                         required
                     />
                 </div>
                 <div className={styles.formGroup}>
-                    <label htmlFor="unit">Unit</label>
+                    <label htmlFor="userName">Your Name</label>
                     <input
                         type="text"
-                        id="unit"
-                        value={unit}
-                        onChange={(e) => setUnit(e.target.value)}
+                        id="userName"
+                        value={userName}
+                        onChange={(e) => setUserName(e.target.value)}
                         required
                     />
                 </div>
@@ -88,7 +116,7 @@ const AddProduct = () => {
                         required
                     />
                 </div>
-                <button type="submit" className={styles.submitButton}>Add Product</button>
+                <button type="submit" className={styles.submitButton}>List Product</button>
             </form>
         </div>
     );

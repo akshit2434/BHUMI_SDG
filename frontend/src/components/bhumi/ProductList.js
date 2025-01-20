@@ -66,13 +66,25 @@ const ProductList = () => {
                             </div>
                             <p className={styles.description}>{product.description}</p>
                             <div className={styles.details}>
-                                <div className={styles.detailItem}>
-                                    <span className={styles.label}>Price</span>
-                                    <span className={styles.value}>${product.price_per_unit}/{product.unit}</span>
+                                <div className={styles.detailRow}>
+                                    <div className={styles.detailItem}>
+                                        <span className={styles.label}>Price</span>
+                                        <span className={styles.value}>₹{product.price_per_unit}/{product.unit}</span>
+                                    </div>
+                                    <div className={styles.detailItem}>
+                                        <span className={styles.label}>Available Units</span>
+                                        <span className={styles.value}>{product.available_units} {product.unit}</span>
+                                    </div>
                                 </div>
-                                <div className={styles.detailItem}>
-                                    <span className={styles.label}>Available Units</span>
-                                    <span className={styles.value}>{product.quantity || 'N/A'}</span>
+                                <div className={styles.detailRow}>
+                                    <div className={styles.detailItem}>
+                                        <span className={styles.label}>Listed By</span>
+                                        <span className={styles.value}>{product.user_name}</span>
+                                    </div>
+                                    <div className={styles.detailItem}>
+                                        <span className={styles.label}>Contact</span>
+                                        <span className={styles.value}>{product.contact}</span>
+                                    </div>
                                 </div>
                             </div>
                             <div className={styles.actions}>

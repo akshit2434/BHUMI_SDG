@@ -23,7 +23,7 @@
 
 .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
     gap: calc(var(--spacing-unit) * 3);
 }
 
@@ -31,18 +31,23 @@
     @include card-base;
     @include card-hover;
     padding: calc(var(--spacing-unit) * 3);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
 
 .productHeader {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
     margin-bottom: calc(var(--spacing-unit) * 2);
 
     h3 {
         font-size: 1.25rem;
         color: var(--color-text);
         margin: 0;
+        flex: 1;
+        padding-right: var(--spacing-unit);
     }
 }
 
@@ -53,30 +58,39 @@
     border-radius: calc(var(--border-radius) / 4);
     font-size: 0.875rem;
     font-weight: 500;
+    white-space: nowrap;
 }
 
 .description {
     color: var(--color-text);
     margin-bottom: calc(var(--spacing-unit) * 2);
     line-height: 1.5;
+    flex-grow: 1;
 }
 
 .details {
     background-color: var(--color-surface-alt);
-    border-radius: calc(var(--border-radius) / 4);
+    border-radius: calc(var(--border-radius) / 2);
     padding: calc(var(--spacing-unit) * 2);
     margin-bottom: calc(var(--spacing-unit) * 2);
 }
 
-.detailItem {
+.detailRow {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    margin-bottom: var(--spacing-unit);
+    gap: calc(var(--spacing-unit) * 2);
+    margin-bottom: calc(var(--spacing-unit) * 2);
 
     &:last-child {
         margin-bottom: 0;
     }
+}
+
+.detailItem {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--spacing-unit) / 2);
 }
 
 .label {
@@ -87,23 +101,38 @@
 .value {
     font-weight: 500;
     color: var(--color-text);
+    font-size: 1rem;
 }
 
 .actions {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    display: flex;
+    justify-content: flex-end;
     gap: calc(var(--spacing-unit) * 2);
+    margin-top: auto;
 }
 
 .contactButton {
     @include button-base;
+    width: 100%;
+    padding: calc(var(--spacing-unit) * 1.5);
+    background-color: var(--color-primary);
+    color: var(--color-text-inverse);
+    border: none;
+    font-weight: 500;
+
+    &:hover {
+        background-color: var(--color-primary-dark);
+    }
 }
 
 .editButton {
     @include button-base;
+    width: 100%;
+    padding: calc(var(--spacing-unit) * 1.5);
     background-color: var(--color-surface);
     color: var(--color-primary);
     border: 1px solid var(--color-primary);
+    font-weight: 500;
 
     &:hover {
         background-color: var(--color-surface-alt);

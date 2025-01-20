@@ -38,6 +38,8 @@ def create_product():
             price_per_unit=float(data['price_per_unit']),
             unit=data['unit'],
             contact=data['contact'],
+            available_units=float(data['available_units']),
+            user_name=data['user_name'],
             user_id=current_user
         )
         product_dict = product.to_dict()
