@@ -25,9 +25,11 @@ axiosInstance.interceptors.request.use(
 
 class BhumiService {
     // Get all available products for browsing
-    async getAllProducts() {
+    async getAllProducts(search = '') {
         try {
-            const response = await axiosInstance.get('/products');
+            const response = await axiosInstance.get('/products', {
+                params: { search }
+            });
             return response.data;
         } catch (error) {
             console.error('Error fetching all products:', error);
@@ -52,6 +54,36 @@ class BhumiService {
             return response.data;
         } catch (error) {
             console.error('Error adding product:', error);
+            throw error;
+        }
+    }
+
+    async updateProduct(productId, productData) {
+        try {
+            const response = await axiosInstance.put(`/products/${productId}`, productData);
+            return response.data;
+        } catch (error) {
+            console.error('Error updating product:', error);
+            throw error;
+        }
+    }
+
+    async deleteProduct(productId) {
+        try {
+            const response = await axiosInstance.delete(`/products/${productId}`);
+            return response.data;
+        } catch (error) {
+            console.error('Error deleting product:', error);
+            throw error;
+        }
+    }
+
+    async getUserDetails() {
+        try {
+            const response = await axiosInstance.get('/user/profile');
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching user details:', error);
             throw error;
         }
     }

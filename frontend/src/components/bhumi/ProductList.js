@@ -9,28 +9,77 @@ const ProductList = () => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [editingProduct, setEditingProduct] = useState(null);
+    const [formData, setFormData] = useState(null);
+
+    const fetchProducts = async () => {
+        setLoading(true);
+        try {
+            const data = await BhumiService.getUserProducts();
+            setProducts(data);
+        } catch (error) {
+            console.error('Error fetching products:', error);
+            setError(error);
+            toast.error(error.message || 'Failed to fetch your products');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const fetchProducts = async () => {
-            setLoading(true);
-            try {
-                const data = await BhumiService.getUserProducts();
-                setProducts(data);
-            } catch (error) {
-                console.error('Error fetching products:', error);
-                setError(error);
-                toast.error(error.message || 'Failed to fetch your products');
-            } finally {
-                setLoading(false);
-            }
-        };
-
         fetchProducts();
     }, []);
 
-    const handleEdit = (productId) => {
-        // TODO: Implement edit functionality
-        toast.info('Edit functionality coming soon');
+    const handleEdit = (product) => {
+        setEditingProduct(product);
+        setFormData({
+            title: product.title,
+            description: product.description,
+            price_per_unit: product.price_per_unit,
+            unit: product.unit,
+            contact: product.contact,
+            available_units: product.available_units,
+            user_name: product.user_name
+        });
+    };
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: name === 'price_per_unit' || name === 'available_units'
+                ? parseFloat(value) || value
+                : value
+        }));
+    };
+
+    const handleUpdate = async (e) => {
+        e.preventDefault();
+        try {
+            await BhumiService.updateProduct(editingProduct._id, formData);
+            toast.success('Product updated successfully');
+            setEditingProduct(null);
+            fetchProducts();
+        } catch (error) {
+            toast.error(error.message || 'Failed to update product');
+        }
+    };
+
+    const handleDelete = async (productId) => {
+        if (window.confirm('Are you sure you want to delete this listing?')) {
+            try {
+                await BhumiService.deleteProduct(productId);
+                toast.success('Product deleted successfully');
+                fetchProducts();
+            } catch (error) {
+                toast.error(error.message || 'Failed to delete product');
+            }
+        }
+    };
+
+    const handleCancel = () => {
+        setEditingProduct(null);
+        setFormData(null);
     };
 
     if (loading) {
@@ -90,13 +139,104 @@ const ProductList = () => {
                             <div className={styles.actions}>
                                 <button
                                     className={styles.editButton}
-                                    onClick={() => handleEdit(product._id)}
+                                    onClick={() => handleEdit(product)}
                                 >
                                     Edit Listing
+                                </button>
+                                <button
+                                    className={styles.deleteButton}
+                                    onClick={() => handleDelete(product._id)}
+                                >
+                                    Delete
                                 </button>
                             </div>
                         </div>
                     ))}
+                </div>
+            )}
+
+            {editingProduct && (
+                <div className={styles.modalOverlay}>
+                    <div className={styles.modal}>
+                        <h3>Edit Product</h3>
+                        <form onSubmit={handleUpdate}>
+                            <div className={styles.formGroup}>
+                                <label>Title</label>
+                                <input
+                                    type="text"
+                                    name="title"
+                                    value={formData.title}
+                                    onChange={handleChange}
+                                    required
+                                />
+                            </div>
+                            <div className={styles.formGroup}>
+                                <label>Description</label>
+                                <textarea
+                                    name="description"
+                                    value={formData.description}
+                                    onChange={handleChange}
+                                    required
+                                />
+                            </div>
+                            <div className={styles.formRow}>
+                                <div className={styles.formGroup}>
+                                    <label>Price per Unit</label>
+                                    <input
+                                        type="number"
+                                        name="price_per_unit"
+                                        value={formData.price_per_unit}
+                                        onChange={handleChange}
+                                        step="0.01"
+                                        min="0"
+                                        required
+                                    />
+                                </div>
+                                <div className={styles.formGroup}>
+                                    <label>Unit</label>
+                                    <input
+                                        type="text"
+                                        name="unit"
+                                        value={formData.unit}
+                                        onChange={handleChange}
+                                        required
+                                    />
+                                </div>
+                            </div>
+                            <div className={styles.formRow}>
+                                <div className={styles.formGroup}>
+                                    <label>Available Units</label>
+                                    <input
+                                        type="number"
+                                        name="available_units"
+                                        value={formData.available_units}
+                                        onChange={handleChange}
+                                        step="0.01"
+                                        min="0"
+                                        required
+                                    />
+                                </div>
+                                <div className={styles.formGroup}>
+                                    <label>Contact</label>
+                                    <input
+                                        type="text"
+                                        name="contact"
+                                        value={formData.contact}
+                                        onChange={handleChange}
+                                        required
+                                    />
+                                </div>
+                            </div>
+                            <div className={styles.modalActions}>
+                                <button type="button" className={styles.cancelButton} onClick={handleCancel}>
+                                    Cancel
+                                </button>
+                                <button type="submit" className={styles.saveButton}>
+                                    Save Changes
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             )}
         </div>

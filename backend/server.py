@@ -248,6 +248,24 @@ def invalid_token_callback(error):
 def expired_token_callback(jwt_header, jwt_data):
     return jsonify({"error": "Token has expired"}), 401
 
+@app.route('/api/user/profile')
+@jwt_required()
+def get_user_profile():
+    try:
+        current_user = get_jwt_identity()
+        user = users_collection.find_one({'email': current_user})
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+
+        return jsonify({
+            "email": user['email'],
+            "organization": user['organization'],
+            "full_name": user['full_name'],
+            "role": user.get('role', 'user')
+        }), 200
+    except Exception as e:
+        return jsonify({"error": "Failed to fetch user profile"}), 500
+
 @app.route('/api/protected')
 @jwt_required()
 def protected():

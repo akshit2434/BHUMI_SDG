@@ -9,26 +9,40 @@ const BrowseProducts = () => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [selectedProduct, setSelectedProduct] = useState(null);
+
+    const fetchProducts = async (search = '') => {
+        setLoading(true);
+        try {
+            const data = await BhumiService.getAllProducts(search);
+            setProducts(data);
+        } catch (error) {
+            console.error('Error fetching products:', error);
+            setError(error);
+            toast.error(error.message || 'Failed to fetch products');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const fetchProducts = async () => {
-            setLoading(true);
-            try {
-                const data = await BhumiService.getAllProducts();
-                setProducts(data);
-            } catch (error) {
-                console.error('Error fetching products:', error);
-                setError(error);
-                toast.error(error.message || 'Failed to fetch products');
-            } finally {
-                setLoading(false);
-            }
-        };
-
         fetchProducts();
     }, []);
 
-    const handleContactClick = (contact) => {
+    const handleSearch = () => {
+        fetchProducts(searchQuery);
+    };
+
+    const handleContactClick = (product) => {
+        setSelectedProduct(product);
+    };
+
+    const handleCloseModal = () => {
+        setSelectedProduct(null);
+    };
+
+    const handleSendEmail = (contact) => {
         window.location.href = `mailto:${contact}`;
     };
 
@@ -48,8 +62,26 @@ const BrowseProducts = () => {
     return (
         <div className={styles.productList}>
             <div className={styles.header}>
-                <h2>Available Byproducts</h2>
-                <p className={styles.subtitle}>Browse and purchase available byproducts</p>
+                <div>
+                    <h2>Available Byproducts</h2>
+                    <p className={styles.subtitle}>Browse and purchase available byproducts</p>
+                </div>
+                <div className={styles.searchContainer}>
+                    <input
+                        type="text"
+                        placeholder="Search products..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className={styles.searchInput}
+                        onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                    />
+                    <button
+                        onClick={handleSearch}
+                        className={styles.searchButton}
+                    >
+                        Search
+                    </button>
+                </div>
             </div>
             {products.length === 0 ? (
                 <div className={styles.emptyState}>
@@ -75,27 +107,53 @@ const BrowseProducts = () => {
                                         <span className={styles.value}>{product.available_units} {product.unit}</span>
                                     </div>
                                 </div>
-                                <div className={styles.detailRow}>
-                                    <div className={styles.detailItem}>
-                                        <span className={styles.label}>Listed By</span>
-                                        <span className={styles.value}>{product.user_name}</span>
-                                    </div>
-                                    <div className={styles.detailItem}>
-                                        <span className={styles.label}>Contact</span>
-                                        <span className={styles.value}>{product.contact}</span>
-                                    </div>
-                                </div>
                             </div>
                             <div className={styles.actions}>
                                 <button
                                     className={styles.contactButton}
-                                    onClick={() => handleContactClick(product.contact)}
+                                    onClick={() => handleContactClick(product)}
                                 >
                                     Contact Seller
                                 </button>
                             </div>
                         </div>
                     ))}
+                </div>
+            )}
+
+            {selectedProduct && (
+                <div className={styles.modalOverlay} onClick={handleCloseModal}>
+                    <div className={styles.modal} onClick={e => e.stopPropagation()}>
+                        <h3>Contact Seller</h3>
+                        <div className={styles.contactDetails}>
+                            <div className={styles.detailRow}>
+                                <div className={styles.detailItem}>
+                                    <span className={styles.label}>Listed By</span>
+                                    <span className={styles.value}>{selectedProduct.user_name}</span>
+                                </div>
+                            </div>
+                            <div className={styles.detailRow}>
+                                <div className={styles.detailItem}>
+                                    <span className={styles.label}>Contact</span>
+                                    <span className={styles.value}>{selectedProduct.contact}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div className={styles.modalActions}>
+                            {/* <button
+                                className={styles.contactButton}
+                                onClick={() => handleSendEmail(selectedProduct.contact)}
+                            >
+                                Send Email
+                            </button> */}
+                            <button
+                                className={styles.cancelButton}
+                                onClick={handleCloseModal}
+                            >
+                                Close
+                            </button>
+                        </div>
+                    </div>
                 </div>
             )}
         </div>

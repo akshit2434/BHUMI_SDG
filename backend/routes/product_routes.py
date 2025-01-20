@@ -10,10 +10,25 @@ products_collection = db['products']
 @product_routes.route('/products', methods=['GET'])
 @jwt_required()
 def get_products():
+    current_user = get_jwt_identity()
+    search_query = request.args.get('search', '').lower()
+    
+    query = {'user_id': {'$ne': current_user}}  # Exclude user's own products
     product_list = []
-    for product_data in products_collection.find():
+    
+    for product_data in products_collection.find(query):
         product = Product(**product_data)
-        product_list.append(product.to_dict())
+        product_dict = product.to_dict()
+        
+        # Apply search filter if search query exists
+        if search_query:
+            title = product_dict.get('title', '').lower()
+            description = product_dict.get('description', '').lower()
+            if search_query in title or search_query in description:
+                product_list.append(product_dict)
+        else:
+            product_list.append(product_dict)
+            
     return jsonify(product_list)
 
 @product_routes.route('/products/user', methods=['GET'])

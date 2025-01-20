@@ -8,6 +8,10 @@
 
 .header {
     margin-bottom: calc(var(--spacing-unit) * 4);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: calc(var(--spacing-unit) * 2);
 
     h2 {
         font-size: 2rem;
@@ -17,8 +21,81 @@
 }
 
 .subtitle {
-    color: var(--color-text-light);
+    color: var(--color-text);
     font-size: 1.1rem;
+}
+
+.searchContainer {
+    min-width: 300px;
+    margin-top: calc(var(--spacing-unit));
+    display: flex;
+    gap: calc(var(--spacing-unit));
+}
+
+.searchInput {
+    flex: 1;
+    padding: calc(var(--spacing-unit) * 1.5);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    color: var(--color-text);
+    background-color: var(--color-surface);
+    transition: border-color 0.2s ease;
+    min-width: 200px;
+
+    &:focus {
+        outline: none;
+        border-color: var(--color-primary);
+    }
+
+    &::placeholder {
+        color: var(--color-text-light);
+    }
+}
+
+.searchButton {
+    @include button-base;
+    padding: calc(var(--spacing-unit) * 1.5) calc(var(--spacing-unit) * 3);
+    background-color: var(--color-primary);
+    color: var(--color-text-light);
+    border: none;
+    font-weight: 500;
+    white-space: nowrap;
+    min-width: 100px;
+
+    &:hover {
+        background-color: var(--color-primary-light);
+    }
+}
+
+.cancelButton {
+    @include button-base;
+    padding: calc(var(--spacing-unit) * 1.5) calc(var(--spacing-unit) * 3);
+    background-color: var(--color-error);
+    color: var(--color-text-light);
+    border: none;
+    font-weight: 500;
+    white-space: nowrap;
+    min-width: 100px;
+
+    &:hover {
+        background-color: var(--color-error-light);
+    }
+}
+
+.saveButton {
+    @include button-base;
+    padding: calc(var(--spacing-unit) * 1.5) calc(var(--spacing-unit) * 3);
+    background-color: var(--color-primary);
+    color: var(--color-text-light);
+    border: none;
+    font-weight: 500;
+    white-space: nowrap;
+    min-width: 100px;
+
+    &:hover {
+        background-color: var(--color-primary-light);
+    }
 }
 
 .grid {
@@ -94,14 +171,13 @@
 }
 
 .label {
-    color: var(--color-text-light);
+    color: var(--color-text);
     font-size: 0.875rem;
 }
 
 .value {
     font-weight: 500;
     color: var(--color-text);
-    font-size: 1rem;
 }
 
 .actions {
@@ -109,6 +185,35 @@
     justify-content: flex-end;
     gap: calc(var(--spacing-unit) * 2);
     margin-top: auto;
+    color: var(--color-text-light);
+}
+
+.editButton,
+.deleteButton {
+    @include button-base;
+    padding: calc(var(--spacing-unit) * 1.5);
+    font-weight: 500;
+    flex: 1;
+}
+
+.editButton {
+    background-color: var(--color-surface);
+    color: var(--color-primary);
+    border: 1px solid var(--color-primary);
+
+    &:hover {
+        background-color: var(--color-surface-alt);
+    }
+}
+
+.deleteButton {
+    background-color: var(--color-surface);
+    color: var(--color-error);
+    border: 1px solid var(--color-error);
+
+    &:hover {
+        background-color: var(--color-error-light);
+    }
 }
 
 .contactButton {
@@ -116,27 +221,114 @@
     width: 100%;
     padding: calc(var(--spacing-unit) * 1.5);
     background-color: var(--color-primary);
-    color: var(--color-text-inverse);
+    color: var(--color-text-light);
     border: none;
     font-weight: 500;
 
     &:hover {
-        background-color: var(--color-primary-dark);
+        background-color: var(--color-primary-light);
     }
 }
 
-.editButton {
-    @include button-base;
-    width: 100%;
-    padding: calc(var(--spacing-unit) * 1.5);
-    background-color: var(--color-surface);
-    color: var(--color-primary);
-    border: 1px solid var(--color-primary);
-    font-weight: 500;
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
 
-    &:hover {
-        background-color: var(--color-surface-alt);
+.modal {
+    background-color: var(--color-surface);
+    border-radius: var(--border-radius);
+    padding: calc(var(--spacing-unit) * 3);
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+
+    h3 {
+        margin-bottom: calc(var(--spacing-unit) * 3);
+        font-size: 1.75rem;
+        color: var(--color-primary-dark);
+        text-align: center;
     }
+}
+
+.formGroup {
+    margin-bottom: calc(var(--spacing-unit) * 2);
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+
+    label {
+        display: block;
+        margin-bottom: calc(var(--spacing-unit) / 2);
+        font-size: 1rem;
+        color: var(--color-text-dark);
+        font-weight: 500;
+    }
+
+    input,
+    textarea,
+    select {
+        width: 100%;
+        padding: calc(var(--spacing-unit) * 1.5);
+        border: 1px solid var(--color-border);
+        border-radius: var(--border-radius);
+        font-size: 1rem;
+        color: var(--color-text);
+        background-color: var(--color-surface-alt);
+        transition: border-color 0.2s ease;
+
+        &:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 2px var(--color-primary-light);
+        }
+    }
+
+    textarea {
+        min-height: 100px;
+    }
+
+    select {
+        appearance: none;
+        background-image: url('data:image/svg+xml;utf8,<svg fill="black" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+        background-repeat: no-repeat;
+        background-position-x: 100%;
+        background-position-y: 50%;
+    }
+}
+
+.formRow {
+    display: flex;
+    gap: calc(var(--spacing-unit) * 2);
+
+    > div {
+        flex: 1;
+    }
+}
+
+.contactDetails {
+    background-color: var(--color-surface-alt);
+    border-radius: calc(var(--border-radius) / 2);
+    padding: calc(var(--spacing-unit) * 2);
+    margin: calc(var(--spacing-unit) * 2) 0;
+}
+
+.modalActions {
+    display: flex;
+    justify-content: flex-end;
+    gap: calc(var(--spacing-unit) * 2);
+    margin-top: calc(var(--spacing-unit) * 4);
 }
 
 .loaderContainer {
@@ -162,6 +354,6 @@
     @include card-base;
     padding: calc(var(--spacing-unit) * 4);
     text-align: center;
-    color: var(--color-text-light);
+    color: var(--color-text);
     background-color: var(--color-surface-alt);
 }

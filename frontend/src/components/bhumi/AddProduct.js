@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import styles from '../../styles/components/bhumi/addProduct.module.scss';
 import BhumiService from '../../services/bhumi.service';
+import Loader from '../common/Loader';
 
 const AddProduct = () => {
     const [title, setTitle] = useState('');
@@ -11,7 +12,25 @@ const AddProduct = () => {
     const [unit, setUnit] = useState('');
     const [contactInfo, setContactInfo] = useState('');
     const [availableUnits, setAvailableUnits] = useState('');
-    const [userName, setUserName] = useState('');
+    const [organizationName, setOrganizationName] = useState('');
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchUserDetails = async () => {
+            try {
+                const data = await BhumiService.getUserDetails();
+                setOrganizationName(data.organization);
+                setContactInfo(data.email);
+                setLoading(false);
+            } catch (error) {
+                console.error('Error fetching user details:', error);
+                toast.error('Failed to fetch user details');
+                setLoading(false);
+            }
+        };
+
+        fetchUserDetails();
+    }, []);
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -23,7 +42,7 @@ const AddProduct = () => {
                 unit,
                 contact: contactInfo,
                 available_units: parseFloat(availableUnits),
-                user_name: userName,
+                user_name: organizationName,
             });
 
             toast.success('Product listed successfully!');
@@ -32,18 +51,21 @@ const AddProduct = () => {
             setDescription('');
             setPricePerUnit('');
             setUnit('');
-            setContactInfo('');
             setAvailableUnits('');
-            setUserName('');
         } catch (error) {
             console.error('Error adding product:', error);
             toast.error(error.message || 'Failed to list product');
         }
     };
 
+    if (loading) {
+        return <div className={styles.loaderContainer}><Loader /></div>;
+    }
+
     return (
         <div className={styles.addProduct}>
             <h2>List a Byproduct</h2>
+            <p className={styles.subtitle}>Listing as: {organizationName}</p>
             <form onSubmit={handleSubmit}>
                 <div className={styles.formGroup}>
                     <label htmlFor="title">Title</label>
@@ -97,23 +119,13 @@ const AddProduct = () => {
                     />
                 </div>
                 <div className={styles.formGroup}>
-                    <label htmlFor="userName">Your Name</label>
+                    <label htmlFor="contactInfo">Contact Email</label>
                     <input
-                        type="text"
-                        id="userName"
-                        value={userName}
-                        onChange={(e) => setUserName(e.target.value)}
-                        required
-                    />
-                </div>
-                <div className={styles.formGroup}>
-                    <label htmlFor="contactInfo">Contact Information</label>
-                    <input
-                        type="text"
+                        type="email"
                         id="contactInfo"
                         value={contactInfo}
-                        onChange={(e) => setContactInfo(e.target.value)}
-                        required
+                        readOnly
+                        className={styles.readOnlyInput}
                     />
                 </div>
                 <button type="submit" className={styles.submitButton}>List Product</button>
