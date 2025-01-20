@@ -3,7 +3,8 @@ import Sidenav from '../../components/carbon/Sidenav';
 import MetricsGrid from '../../components/carbon/Metric';
 import MetricInput from '../../components/carbon/MetricInput';
 import EmissionHistory from '../../components/carbon/EmissionHistory';
-import Goals from '../../components/carbon/Goals/index';
+import Goals from '../../components/carbon/Goals';
+import Reports from '../../components/carbon/Reports';
 import styles from '../../styles/components/carbon/dashboard.module.scss';
 
 const Dashboard = () => {
@@ -12,7 +13,6 @@ const Dashboard = () => {
 
     const handleEmissionSubmit = async (response) => {
         try {
-            // Trigger a refresh by updating the refreshKey
             setRefreshKey(oldKey => oldKey + 1);
         } catch (error) {
             console.error('Error handling emission submission:', error);
@@ -46,7 +46,7 @@ const Dashboard = () => {
             case 'goals':
                 return <Goals />;
             case 'reports':
-                return <div>Reports</div>;
+                return <Reports />;
             default:
                 return <div>Section under development</div>;
         }

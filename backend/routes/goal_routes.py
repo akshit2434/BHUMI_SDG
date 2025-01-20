@@ -4,6 +4,7 @@ from bson import ObjectId, json_util
 import json
 from models.goal import Goal
 from datetime import datetime
+from db import db
 
 goal_bp = Blueprint('goals', __name__)
 
@@ -16,7 +17,6 @@ def serialize_mongodb_obj(obj):
 def get_goals():
     try:
         current_user = get_jwt_identity()
-        db = current_app.config['DATABASE']
         user = db.users.find_one({'email': current_user})
         
         if not user:
@@ -64,7 +64,6 @@ def get_goals():
 def create_goal():
     try:
         current_user = get_jwt_identity()
-        db = current_app.config['DATABASE']
         user = db.users.find_one({'email': current_user})
         
         if not user:
@@ -130,7 +129,6 @@ def create_goal():
 def update_goal(goal_id):
     try:
         current_user = get_jwt_identity()
-        db = current_app.config['DATABASE']
         user = db.users.find_one({'email': current_user})
         
         if not user:
@@ -180,7 +178,6 @@ def update_goal(goal_id):
 def delete_goal(goal_id):
     try:
         current_user = get_jwt_identity()
-        db = current_app.config['DATABASE']
         user = db.users.find_one({'email': current_user})
         
         if not user:

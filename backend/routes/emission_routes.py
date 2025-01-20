@@ -1,15 +1,12 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from models.emission import EmissionLog  # Now correctly importing EmissionLog
+from models.emission import EmissionLog 
 from models.user_units import UserUnits
 from datetime import datetime, timedelta
+from db import db
 
 # Change the blueprint registration to include url_prefix
 emission_bp = Blueprint('emission', __name__, url_prefix='/api')
-
-def get_db():
-    from flask import current_app
-    return current_app.config['DATABASE'] 
 
 # Helper functions
 def get_day_before(date):
@@ -61,7 +58,6 @@ def log_emission():
 
         email = get_jwt_identity()
         
-        db = get_db()
         user = db.users.find_one({'email': email})
         if not user:
             return jsonify({'error': 'User not found'}), 404
@@ -126,7 +122,6 @@ def get_emission_history():
         return jsonify({}), 200
     
     try:
-        db = get_db()
         email = get_jwt_identity()
         
         # Get user ID from email
@@ -196,7 +191,6 @@ def get_user_units():
     if request.method == 'OPTIONS':
         return jsonify({}), 200
     try:
-        db = get_db()
         email = get_jwt_identity()
         
         user = db.users.find_one({'email': email})
@@ -233,7 +227,6 @@ def update_user_units():
     if request.method == 'OPTIONS':
         return jsonify({}), 200
     try:
-        db = get_db()
         email = get_jwt_identity()
         data = request.get_json()
         
@@ -286,7 +279,6 @@ def update_user_units():
 def manage_metrics():
     if request.method == 'OPTIONS':
         return jsonify({}), 200
-    db = get_db()
     email = get_jwt_identity()
     
     # Get user first
@@ -373,7 +365,6 @@ def manage_metrics():
 @jwt_required()
 def add_custom_metric():
     try:
-        db = get_db()
         email = get_jwt_identity()
         data = request.get_json()
 
@@ -448,7 +439,6 @@ def get_emissions_for_period():
                 'error': 'Invalid date format. Use ISO format.'
             }), 400
 
-        db = get_db()
         email = get_jwt_identity()
         user = db.users.find_one({'email': email})
         
@@ -485,7 +475,6 @@ def get_emissions_for_period():
 @jwt_required()
 def get_emission_ranges():
     try:
-        db = get_db()
         email = get_jwt_identity()
         user = db.users.find_one({'email': email})
         
@@ -521,7 +510,6 @@ def get_emission_ranges():
 @jwt_required()
 def get_all_emissions():
     try:
-        db = get_db()
         email = get_jwt_identity()
         user = db.users.find_one({'email': email})
         

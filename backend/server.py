@@ -3,11 +3,11 @@ from flask_cors import CORS
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from flask_bcrypt import Bcrypt
 from datetime import timedelta, datetime
-from pymongo import MongoClient
 from dotenv import load_dotenv
 import os
 from models.user import User
 from models.user_units import UserUnits
+from db import db
 
 # Load environment variables
 load_dotenv()
@@ -18,44 +18,42 @@ app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=1)
 jwt = JWTManager(app)
 bcrypt = Bcrypt(app)
 
-# Configure CORS
-CORS(app, supports_credentials=True, resources={
-    r"/*": {
-        "origins": os.getenv('FRONTEND_URL'),
-        "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],  # Added DELETE
+# Update CORS configuration
+CORS(app, resources={
+    r"/api/*": {
+        "origins": ["http://localhost:3000"],
+        "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         "allow_headers": ["Content-Type", "Authorization"],
-        "expose_headers": ["Authorization"],
-        "max_age": 3600,
         "supports_credentials": True
     }
 })
 
-# MongoDB connection
-try:
-    client = MongoClient(os.getenv('MONGODB_URI'))
-    db = client[os.getenv('DATABASE_NAME')]
-    users_collection = db['users']
-    
-    # Initialize collections if they don't exist
-    if 'emissions' not in db.list_collection_names():
-        db.create_collection('emissions')
-    
-    if 'user_units' not in db.list_collection_names():
-        db.create_collection('user_units')
-        
-except Exception as e:
-    print(f"MongoDB connection error: {str(e)}")
-    raise
+# Remove MongoDB connection code and keep the users_collection reference
+users_collection = db['users']
 
 # Make db available to routes
 app.config['DATABASE'] = db
 
+# Move blueprint imports after app creation
 from routes.emission_routes import emission_bp
 from routes.goal_routes import goal_bp
+from routes.report_routes import report_bp
+from routes.product_routes import product_routes
+from flask import send_from_directory
 
 # Add blueprint registration after CORS setup
 app.register_blueprint(emission_bp)
+
+@app.route('/bhumi')
+def bhumi_app():
+    return send_from_directory('../frontend/public', 'index.html')
+
+@app.route('/bhumi/<path:filename>')
+def bhumi_static_files(filename):
+    return send_from_directory('../frontend/public', filename)
 app.register_blueprint(goal_bp)
+app.register_blueprint(report_bp)
+app.register_blueprint(product_routes)
 
 # Add before jwt_required endpoints
 @app.before_request
@@ -65,8 +63,8 @@ def handle_preflight():
         
         # Add CORS headers to response
         headers = {
-            'Access-Control-Allow-Origin': os.getenv('FRONTEND_URL'),
-            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',  # Added DELETE
+            'Access-Control-Allow-Origin': 'http://localhost:3000',
+            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
             'Access-Control-Allow-Headers': 'Content-Type, Authorization',
             'Access-Control-Allow-Credentials': 'true',
             'Access-Control-Max-Age': '3600'
@@ -117,16 +115,12 @@ def complete_registration():
     current_user = get_jwt_identity()
     data = request.get_json()
     
-    # Add debug logging
-    print("Received registration data:", data)
-    print("Current user from token:", current_user)
-    
     # Verify required fields
     required_fields = ['email', 'password', 'full_name', 'phone', 'organization', 'industry']
     missing_fields = [field for field in required_fields if field not in data]
     if missing_fields:
         return jsonify({
-            "error": f"Missing rr required fields: {', '.join(missing_fields)}"
+            "error": f"Missing required fields: {', '.join(missing_fields)}"
         }), 400
     
     # Double-check email matches token
@@ -184,8 +178,6 @@ def complete_registration():
         print(f"Registration error: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
-# Remove the duplicate route and keep only this version
-
 @app.route('/api/auth/login', methods=['POST'])
 def login():
     data = request.get_json()
@@ -221,7 +213,7 @@ def update_user_details():
     
     required_fields = ['full_name', 'phone', 'organization', 'industry', 'password']
     if not all(field in data for field in required_fields):
-        return jsonify({"error": "Missing rar required fields"}), 400
+        return jsonify({"error": "Missing required fields"}), 400
     
     # Validate industry type
     valid_industries = ['Manufacturing', 'Agriculture', 'Textile', 'Other']

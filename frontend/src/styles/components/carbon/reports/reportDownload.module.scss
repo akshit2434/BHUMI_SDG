@@ -1,0 +1,89 @@
+@import "../../../globals.scss";
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: calc(var(--spacing-unit) * 3);
+}
+
+.downloadButton {
+    @include button-base;
+    max-width: 300px;
+    background: var(--color-success);
+    position: relative;
+    overflow: hidden;
+
+    &:hover {
+        background: var(--color-success-dark);
+    }
+
+    &:disabled {
+        background: var(--color-surface-alt);
+        cursor: wait;
+
+        &:hover {
+            transform: none;
+            box-shadow: none;
+        }
+    }
+}
+
+.buttonText {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: calc(var(--spacing-unit));
+
+    &::before {
+        content: "↓";
+        font-weight: bold;
+    }
+}
+
+.loadingText {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: calc(var(--spacing-unit));
+
+    &::after {
+        content: "";
+        animation: loading 1.5s infinite steps(4, end);
+    }
+}
+
+.error {
+    margin-top: calc(var(--spacing-unit) * 2);
+    padding: calc(var(--spacing-unit) * 2);
+    background-color: var(--color-error-light);
+    color: var(--color-error-dark);
+    border-radius: calc(var(--border-radius) / 4);
+    text-align: center;
+    max-width: 300px;
+}
+
+@keyframes loading {
+    0% {
+        content: ".";
+    }
+    25% {
+        content: "..";
+    }
+    50% {
+        content: "...";
+    }
+    75% {
+        content: "....";
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        margin-top: calc(var(--spacing-unit) * 2);
+    }
+
+    .downloadButton {
+        width: 100%;
+    }
+}

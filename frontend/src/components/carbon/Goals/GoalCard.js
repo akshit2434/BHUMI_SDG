@@ -1,7 +1,10 @@
 import React from 'react';
 import { FaTrash, FaEdit, FaArrowUp, FaArrowDown } from 'react-icons/fa';
 import styles from '../../../styles/components/carbon/goals/goalCard.module.scss';
+import Loader from '../../common/Loader'; // Import the Loader component
+
 const GoalCard = ({ goal, progress = {}, onEdit, onDelete }) => {
+    // Function to format date strings to year
     const formatDate = (dateStr) => {
         if (!dateStr) return '';
         try {
@@ -63,8 +66,17 @@ const GoalCard = ({ goal, progress = {}, onEdit, onDelete }) => {
 
     const status = getStatusLabel();
 
+    // Render loader if goal data or progress is not yet available
+    if (!goal || !progress) {
+        return (
+            <div className={styles.goalCard}>
+                <Loader text="Loading goal data..." />
+            </div>
+        );
+    }
+
     return (
-        <div className={`${styles.goalCard} ${getCardStatusClass()}`}>
+        <div className={styles.goalCard}>
             <div className={styles.goalHeader}>
                 <div className={styles.headerMain}>
                     <h3>{goal.title}</h3>

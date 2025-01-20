@@ -6,6 +6,7 @@ import './styles/globals.scss'
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Dashboard from './pages/carbon/Dashboard';
+import BhumiDashboard from './pages/bhumi/Dashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -20,6 +21,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/bhumi"
+            element={
+              <ProtectedRoute>
+                <BhumiDashboard />
               </ProtectedRoute>
             }
           />

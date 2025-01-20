@@ -1,18 +1,18 @@
+
 import React from 'react';
-import { FaIndustry, FaChartLine, FaFileAlt, FaUsers, FaCog, FaSignOutAlt, FaPlus } from 'react-icons/fa';
+import { FaStore, FaShoppingCart, FaIndustry, FaHistory, FaCog, FaSignOutAlt, FaPlus, FaList } from 'react-icons/fa';
 import AuthService from '../../services/auth.service';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import styles from '../../styles/components/carbon/sidenav.module.scss';
+import styles from '../../styles/components/bhumi/sidenav.module.scss';
 
 const Sidenav = ({ activeTab, setActiveTab }) => {
     const navigate = useNavigate();
     const sidebarItems = [
-        { id: 'overview', label: 'Overview', icon: <FaChartLine /> },
-        { id: 'log', label: 'Log Emissions', icon: <FaPlus /> },
-        { id: 'emissions', label: 'History', icon: <FaIndustry /> },
-        { id: 'goals', label: 'Goals', icon: <FaPlus /> },
-        { id: 'reports', label: 'Reports', icon: <FaFileAlt /> },
+        { id: 'buy', label: 'Buy Byproducts', icon: <FaStore /> },
+        { id: 'sell', label: 'Sell Byproducts', icon: <FaPlus /> },
+        { id: 'orders', label: 'Orders', icon: <FaShoppingCart /> },
+        { id: 'listings', label: 'My Listings', icon: <FaList /> },
         // { id: 'settings', label: 'Settings', icon: <FaCog /> }
     ];
 
@@ -29,13 +29,9 @@ const Sidenav = ({ activeTab, setActiveTab }) => {
             transition={{ duration: 0.3 }}
         >
             <div className={styles.logo}>
-                <FaIndustry />
-                <span>CarbonTrack</span>
+                <FaStore />
+                <span>bhumi</span>
             </div>
-            {/* <div className={styles.userInfo}>
-                <div className={styles.avatar}></div>
-                <span>Welcome, Admin</span>
-            </div> */}
             <ul className={styles.navList}>
                 {sidebarItems.map((item) => (
                     <motion.li
@@ -53,15 +49,15 @@ const Sidenav = ({ activeTab, setActiveTab }) => {
             </ul>
             <div className={styles.bottomSection}>
                 <motion.button
-                    className={styles.bhumiBtn}
+                    className={styles.carbonBtn}
                     onClick={() => {
-                        // Navigate to the bhumi section (to be implemented later)
-                        window.location.href = '/bhumi';
+                        window.location.href = '/carbon';
                     }}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                 >
-                    <span>bhumi</span>
+                    <FaIndustry />
+                    <span>CarbonTrack</span>
                 </motion.button>
                 <motion.button
                     className={styles.logoutBtn}
