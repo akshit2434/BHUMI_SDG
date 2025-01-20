@@ -1,0 +1,11 @@
+flask==2.3.3
+flask-cors==4.0.0
+flask-jwt-extended==4.5.2
+flask-bcrypt==1.0.1
+python-dotenv==1.0.0
+pymongo==4.5.0
+google-generativeai==0.2.0
+numpy==1.24.3
+reportlab==4.0.4
+bson==0.5.10
+python-json-logger==2.0.7
