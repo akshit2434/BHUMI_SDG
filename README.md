@@ -22,3 +22,9 @@ npm run start
 cd backend
 pip install -r requirements.txt
 python server.py
+```
+
+### Screenshots/Preview
+
+https://github.com/user-attachments/assets/40d0c8ea-930a-409a-89ff-a9b87290095f
+
